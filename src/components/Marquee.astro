@@ -1,0 +1,92 @@
+---
+/**
+ * A drifting band of collection names between the wall and the studio panel.
+ *
+ * Nothing here is decoration standing in for content: every word is a
+ * collection the site actually has, and every one is a link. The band is
+ * repeated so the loop has no seam, and the script adds as many repeats as
+ * the window needs — with two collections a single pair leaves the right half
+ * of the bar empty, and the copies are the half a reader can actually see, so
+ * they are links too rather than inert spans.
+ *
+ * Pace is a constant number of pixels a second rather than a fixed duration,
+ * so the speed does not depend on how many collections exist.
+ */
+import { strings } from "@/config/strings";
+
+interface Props {
+  items: { label: string; href: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <nav class="marquee" aria-label={strings.nav.browseCollections} data-marquee>
+      <div class="marquee-track" data-marquee-track>
+        <div class="marquee-band" data-marquee-band>
+          {items.map((item) => (
+            <a class="marquee-item" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+        </div>
+        <div class="marquee-band" aria-hidden="true">
+          {items.map((item) => (
+            <a class="marquee-item" href={item.href} tabindex="-1">
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+<script>
+  const SPEED = 72; // pixels a second
+
+  const marquee = document.querySelector<HTMLElement>("[data-marquee]");
+  const track = marquee?.querySelector<HTMLElement>("[data-marquee-track]");
+  const band = marquee?.querySelector<HTMLElement>("[data-marquee-band]");
+
+  if (marquee && track && band) {
+    const fit = () => {
+      const width = band.getBoundingClientRect().width;
+      if (!width) return;
+
+      /* Cover the window with one band to spare, so the jump at the end of
+         the loop happens off-screen. */
+      const wanted = Math.max(2, Math.ceil(marquee.getBoundingClientRect().width / width) + 1);
+
+      while (track.children.length > wanted) track.lastElementChild?.remove();
+      while (track.children.length < wanted) {
+        const copy = band.cloneNode(true) as HTMLElement;
+        copy.removeAttribute("data-marquee-band");
+        copy.setAttribute("aria-hidden", "true");
+        copy.querySelectorAll("a").forEach((link) => link.setAttribute("tabindex", "-1"));
+        track.append(copy);
+      }
+
+      track.style.setProperty("--marquee-shift", `-${width}px`);
+      track.style.setProperty("--marquee-duration", `${width / SPEED}s`);
+    };
+
+    fit();
+
+    let queued = false;
+    window.addEventListener(
+      "resize",
+      () => {
+        if (queued) return;
+        queued = true;
+        window.requestAnimationFrame(() => {
+          queued = false;
+          fit();
+        });
+      },
+      { passive: true },
+    );
+  }
+</script>

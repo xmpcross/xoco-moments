@@ -1,0 +1,27 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+
+/**
+ * Detail a reader can ask for: what a collection includes, a long caveat, the
+ * answer to a question only some people have. Several in a row read as a
+ * short FAQ, and each opens on its own.
+ *
+ * Built on `<details>`, so it works with no JavaScript and is found by the
+ * browser's own in-page search.
+ */
+interface Props {
+  heading: string;
+  /** Open on load. Useful for the first of a run. */
+  open?: boolean;
+}
+
+const { heading, open = false } = Astro.props;
+---
+
+<details class="card card-toggle" open={open}>
+  <summary>
+    {heading}
+    <Icon name="chevron-down" />
+  </summary>
+  <div class="card-toggle-body"><slot /></div>
+</details>

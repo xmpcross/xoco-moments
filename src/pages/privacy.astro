@@ -1,0 +1,51 @@
+---
+import ProseRuntime from "@/components/content/ProseRuntime.astro";
+import { siteConfig } from "@/config/site";
+import PageLayout from "@/layouts/PageLayout.astro";
+---
+
+<PageLayout title="Privacy" description={`Privacy policy for ${siteConfig.name}.`}>
+  <header class="wrap wrap-mid page-head">
+    <h1 class="display page-head-title" data-reveal="up">Privacy</h1>
+    <p class="lede page-head-lede" data-reveal="up">
+      What a studio running this theme may collect, how it can be used, and how to get in touch
+      about it.
+    </p>
+  </header>
+
+  <div class="wrap wrap-mid section-tight">
+    <div class="prose prose-page">
+      <h2>What is collected</h2>
+      <p>
+        The site itself stores nothing on a server. One thing is kept in your own browser and
+        never leaves it: which colour mode you chose.
+      </p>
+      <p>
+        If the mailing list or the enquiry form has been connected to a provider, the address and
+        the message you send go to that provider. Nothing else is gathered.
+      </p>
+
+      <h2>How it is used</h2>
+      <p>
+        An enquiry is answered and then kept only as long as the conversation needs it. A mailing
+        list address is used to send the work, and nothing else.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        {
+          siteConfig.email ? (
+            <>
+              For anything about your data, write to{" "}
+              <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>.
+            </>
+          ) : (
+            "Add a contact address in src/config/site.ts before publishing."
+          )
+        }
+      </p>
+    </div>
+  </div>
+
+  <ProseRuntime />
+</PageLayout>

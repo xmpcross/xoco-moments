@@ -1,0 +1,146 @@
+---
+import { getCollection } from "astro:content";
+import HomeHero from "@/components/HomeHero.astro";
+import HomeHeroSplit from "@/components/HomeHeroSplit.astro";
+import Marquee from "@/components/Marquee.astro";
+import StudioPanel from "@/components/StudioPanel.astro";
+import Testimonials from "@/components/Testimonials.astro";
+import Tile from "@/components/Tile.astro";
+import Wall from "@/components/Wall.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { collectionMeta, collectionSlug, type Collection } from "@/config/collections";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import { testimonials } from "@/config/testimonials";
+import PageLayout from "@/layouts/PageLayout.astro";
+import {
+  excludePosts,
+  firstYear,
+  getByCollection,
+  getFeatured,
+  usedCollections,
+  visiblePosts,
+} from "@/lib/posts";
+import studioImage from "@/assets/studio.webp";
+
+/*
+ * The front page opens on the featured work, then hands the page to the wall.
+ * The studio panel and the closing call are the only words on it.
+ */
+const allPosts = visiblePosts(await getCollection("posts"));
+
+const heroStyle = siteConfig.heroStyle;
+const featured = getFeatured(allPosts, 3);
+
+/* With the hero off, every story can appear in the wall, including the
+   featured ones. When a hero is on, they lead it instead. */
+const wall = (heroStyle === "off" ? allPosts : excludePosts(allPosts, featured)).slice(
+  0,
+  siteConfig.homeLimit,
+);
+
+const strip = siteConfig.featuredCollection
+  ? getByCollection(allPosts, siteConfig.featuredCollection as Collection, 3)
+  : [];
+const stripMeta = siteConfig.featuredCollection
+  ? collectionMeta[siteConfig.featuredCollection as Collection]
+  : undefined;
+const stripHref = `/collection/${collectionSlug(siteConfig.featuredCollection ?? "")}/`;
+
+const marqueeItems = usedCollections(allPosts).map((entry) => ({
+  label: entry.name,
+  href: entry.href,
+}));
+---
+
+<PageLayout over={heroStyle === "full-bleed"}>
+  {/* The hero can carry three story titles, so none of them can be the h1: a
+      page has one, and on a portfolio front page it is the studio. */}
+  <h1 class="sr-only">{siteConfig.name} — {siteConfig.tagline}</h1>
+
+  {heroStyle === "full-bleed" && <HomeHero posts={featured} />}
+  {heroStyle === "split" && featured[0] && <HomeHeroSplit post={featured[0]} />}
+
+  <section class="wrap section-tight home-work" id="work" aria-label={strings.home.recentWork}>
+    {/* A hero fills the window, so nothing in the wall is on the first screen. */}
+    <Wall
+      posts={wall}
+      headingLevel="h2"
+      eagerCount={heroStyle === "off" ? siteConfig.gridColumns + 1 : 0}
+      priorityCount={heroStyle === "off" ? 2 : 0}
+    />
+
+    <div class="home-grid-foot">
+      <a class="btn btn-outline" href="/work/"><span>{strings.home.showMore}</span></a>
+    </div>
+  </section>
+
+  {
+    siteConfig.showMarquee && marqueeItems.length > 0 && (
+      <section class="section-tight">
+        <Marquee items={marqueeItems} />
+      </section>
+    )
+  }
+
+  {
+    strip.length > 0 && stripMeta && (
+      <section class="wrap section">
+        <div class="home-collection">
+          <div class="home-collection-intro">
+            <h2 class="title-lg" data-reveal="up">
+              {siteConfig.featuredCollection}
+            </h2>
+            <p class="lede" data-reveal="up">
+              {stripMeta.description}
+            </p>
+            <a class="arrow-link" href={stripHref} data-reveal="up">
+              <span>{strings.seeAll}</span>
+              <Icon name="chevron-right" />
+            </a>
+          </div>
+
+          <div class="strip" data-reveal-group="60">
+            {strip.map((post) => (
+              <Tile
+                post={post}
+                sizes="(min-width: 72rem) 26vw, (min-width: 40rem) 30vw, 92vw"
+                headingLevel="h3"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    siteConfig.showStudioPanel && (
+      <StudioPanel
+        title={strings.home.studio}
+        text={siteConfig.bio}
+        href="/studio/"
+        image={studioImage}
+        imageAlt={siteConfig.studioImageAlt}
+        figures={[
+          { label: strings.home.stories, value: allPosts.length },
+          { label: strings.home.since, value: firstYear(allPosts) },
+        ]}
+      />
+    )
+  }
+
+  {siteConfig.showTestimonials && <Testimonials items={testimonials} />}
+
+  <section class="wrap home-call-section">
+    <div class="home-call">
+      <h2 class="title-xl home-call-title" data-reveal="up">{strings.home.sayHello}</h2>
+      <p class="lede" data-reveal="up">
+        {siteConfig.contact.prompt} {siteConfig.contact.responseTime}
+      </p>
+      <a class="btn btn-accent" href="/contact/" data-reveal="up">
+        <span>{strings.home.getInTouch}</span>
+      </a>
+    </div>
+  </section>
+</PageLayout>

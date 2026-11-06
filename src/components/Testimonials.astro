@@ -1,0 +1,330 @@
+---
+import { Image } from "astro:assets";
+import Icon from "@/components/ui/Icon.astro";
+import { strings } from "@/config/strings";
+import type { Testimonial } from "@/config/testimonials";
+
+/**
+ * Kind words, one at a time: the couple's photograph beside what they said.
+ *
+ * The slider is a scroll-snap track, so it works with no JavaScript at all —
+ * a phone swipes it natively and a trackpad scrolls it. The script only adds
+ * the arrows, the dots and the arrow keys, and keeps the dots in step with
+ * whatever the reader scrolled to. Nothing advances on its own: the hero
+ * already moves, and two things moving on one page is one too many.
+ */
+interface Props {
+  items: Testimonial[];
+  title?: string;
+}
+
+const { items, title = strings.home.kindWords } = Astro.props;
+const many = items.length > 1;
+---
+
+{
+  items.length > 0 && (
+    <section
+      class="wrap section-tight testimonials"
+      aria-labelledby="testimonials-title"
+      data-testimonials
+    >
+      <div class="testimonials-head">
+        <h2 class="title-lg" id="testimonials-title" data-reveal="up">
+          {title}
+        </h2>
+
+        {many && (
+          <div class="testimonials-controls" data-reveal="up">
+            <button
+              type="button"
+              class="icon-btn"
+              data-testimonials-prev
+              aria-label={strings.testimonials.previous}
+            >
+              <Icon name="arrow-left" size={18} />
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              data-testimonials-next
+              aria-label={strings.testimonials.next}
+            >
+              <Icon name="arrow-right" size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div
+        class="testimonials-track"
+        data-testimonials-track
+        tabindex={many ? 0 : undefined}
+        data-reveal="fade"
+      >
+        {items.map((item, index) => (
+          <figure class="testimonial" data-testimonial aria-label={`${index + 1} / ${items.length}`}>
+            <div class="testimonial-media">
+              <Image
+                src={item.image}
+                alt={item.imageAlt}
+                widths={[480, 720, 960]}
+                sizes="(min-width: 64rem) 24rem, 14rem"
+                loading="lazy"
+                decoding="async"
+                data-autosize
+              />
+            </div>
+
+            <blockquote class="testimonial-quote">
+              <p>{item.quote}</p>
+            </blockquote>
+
+            <figcaption class="testimonial-who">
+              <span class="testimonial-names">{item.names}</span>
+              <span class="label label-soft meta-row">
+                {item.detail.map((line) => (
+                  <span>{line}</span>
+                ))}
+              </span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      {many && (
+        <ol class="testimonials-dots">
+          {items.map((item, index) => (
+            <li>
+              <button
+                type="button"
+                class="testimonials-dot"
+                data-testimonials-dot
+                aria-current={index === 0 ? "true" : "false"}
+                aria-label={strings.testimonials.show(index + 1, item.names)}
+              />
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  )
+}
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-testimonials]").forEach((root) => {
+    const track = root.querySelector<HTMLElement>("[data-testimonials-track]");
+    const slides = [...root.querySelectorAll<HTMLElement>("[data-testimonial]")];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>("[data-testimonials-dot]")];
+    if (!track || slides.length < 2) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let current = 0;
+
+    const mark = (index: number) => {
+      current = index;
+      dots.forEach((dot, n) => dot.setAttribute("aria-current", n === index ? "true" : "false"));
+    };
+
+    const go = (index: number) => {
+      const target = (index + slides.length) % slides.length;
+      track.scrollTo({
+        left: slides[target].offsetLeft,
+        behavior: reduced.matches ? "auto" : "smooth",
+      });
+      mark(target);
+    };
+
+    root.querySelector("[data-testimonials-prev]")?.addEventListener("click", () => go(current - 1));
+    root.querySelector("[data-testimonials-next]")?.addEventListener("click", () => go(current + 1));
+    dots.forEach((dot, index) => dot.addEventListener("click", () => go(index)));
+
+    track.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") go(current - 1);
+      if (event.key === "ArrowRight") go(current + 1);
+    });
+
+    /* A swipe or a trackpad scroll moves the track without the buttons, so
+       the dots follow whatever is actually in view. */
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) mark(slides.indexOf(entry.target as HTMLElement));
+          });
+        },
+        { root: track, threshold: 0.6 },
+      );
+      slides.forEach((slide) => observer.observe(slide));
+    }
+  });
+</script>
+
+<style>
+  .testimonials-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.75rem, 3.5vw, 3rem);
+  }
+
+  .testimonials-controls {
+    display: none;
+    gap: 0.25rem;
+    margin-right: -0.5rem;
+  }
+
+  :global(.js) .testimonials-controls {
+    display: flex;
+  }
+
+  .testimonials-track {
+    position: relative;
+    display: flex;
+    gap: clamp(2rem, 4vw, 4rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    outline-offset: 8px;
+  }
+
+  .testimonials-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .testimonial {
+    display: grid;
+    flex: 0 0 100%;
+    grid-template-areas:
+      "media"
+      "quote"
+      "who";
+    gap: 0;
+    margin: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .testimonial-media {
+    grid-area: media;
+    width: min(100%, 14rem);
+    aspect-ratio: 4 / 5;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+    overflow: hidden;
+    background: var(--muted);
+  }
+
+  .testimonial-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .testimonial-quote {
+    grid-area: quote;
+    max-width: 40rem;
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: clamp(1.375rem, 2.4vw, 2.125rem);
+    font-weight: var(--title-weight);
+    letter-spacing: var(--title-tracking);
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  .testimonial-quote::before {
+    display: block;
+    width: 0.8em;
+    height: 0.55em;
+    margin: 0 0 1.25rem;
+    color: var(--accent-text);
+    content: "\201C";
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(3.5rem, 6vw, 5rem);
+    letter-spacing: 0;
+    line-height: 1;
+  }
+
+  .testimonial-quote p {
+    margin: 0;
+  }
+
+  .testimonial-who {
+    grid-area: who;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 40rem;
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .testimonial-names {
+    font-family: var(--font-label);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .testimonials-dots {
+    display: none;
+    gap: 0.5rem;
+    margin: clamp(1.75rem, 3.5vw, 3rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :global(.js) .testimonials-dots {
+    display: flex;
+  }
+
+  .testimonials-dot {
+    position: relative;
+    width: 2.25rem;
+    height: 2px;
+    padding: 0;
+    border: 0;
+    background: var(--border);
+    transition: background-color 0.3s var(--ease);
+  }
+
+  /* The bar is two pixels tall; the target is not. */
+  .testimonials-dot::before {
+    position: absolute;
+    inset: -0.75rem 0;
+    content: "";
+  }
+
+  .testimonials-dot[aria-current="true"] {
+    background: var(--foreground);
+  }
+
+  @media (min-width: 64rem) {
+    .testimonial {
+      grid-template-areas:
+        "media ."
+        "media quote"
+        "media who"
+        "media .";
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      grid-template-rows: 1fr auto auto 1fr;
+      column-gap: clamp(2rem, 4vw, 4.5rem);
+    }
+
+    .testimonial-media {
+      width: 100%;
+      max-width: 24rem;
+      margin-bottom: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .testimonials-track {
+      scroll-behavior: auto;
+    }
+
+    .testimonials-dot {
+      transition: none;
+    }
+  }
+</style>

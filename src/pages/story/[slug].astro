@@ -1,0 +1,129 @@
+---
+import { getCollection, render } from "astro:content";
+import type { GetStaticPaths } from "astro";
+import PostHero from "@/components/PostHero.astro";
+import PostNext from "@/components/PostNext.astro";
+import ShareButton from "@/components/ShareButton.astro";
+import ShareSheet from "@/components/ShareSheet.astro";
+import Wall from "@/components/Wall.astro";
+import ProseRuntime from "@/components/content/ProseRuntime.astro";
+import { collectionSlug } from "@/config/collections";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import PageLayout from "@/layouts/PageLayout.astro";
+import {
+  getNext,
+  getRelated,
+  postHref,
+  postSlug,
+  tagSlug,
+  visiblePosts,
+  type Post,
+} from "@/lib/posts";
+import { absoluteUrl, postBreadcrumbSchema, postSchema } from "@/lib/schema";
+import { getSocialCard } from "@/lib/social-card";
+import { storyComponents } from "@/lib/story-components";
+
+export const getStaticPaths = (async () => {
+  const posts = visiblePosts(await getCollection("posts"));
+
+  return posts.map((post) => ({
+    params: { slug: postSlug(post) },
+    props: { post, posts },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: Post;
+  posts: Post[];
+}
+
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+
+const related = siteConfig.post.showRelated ? getRelated(posts, post, 3) : [];
+const next = siteConfig.post.showNext ? getNext(posts, post) : undefined;
+const shareUrl = new URL(postHref(post), siteConfig.siteUrl).toString();
+const editorial = post.data.storyLayout === "editorial";
+
+/* The same crop the layout puts in og:image, so the two agree. */
+const card = await getSocialCard(post.data.cover.src);
+const schema = [postSchema(post, absoluteUrl(card.src)), postBreadcrumbSchema(post)];
+---
+
+<PageLayout
+  over={!editorial}
+  title={post.data.title}
+  description={post.data.excerpt}
+  image={post.data.cover.src}
+  imageAlt={post.data.cover.alt}
+  type="article"
+  article={{
+    published: post.data.date,
+    modified: post.data.updatedDate,
+    section: post.data.collection,
+    tags: post.data.tags,
+  }}
+  structuredData={schema}
+>
+  <article>
+    <PostHero post={post} />
+
+    {
+      /* The editorial layout has already printed the excerpt under its title,
+         so repeating it here would read as a stutter. */
+      !editorial && (
+        <div class="wrap wrap-reading">
+          <p class="post-lede" data-reveal="up">
+            {post.data.excerpt}
+          </p>
+        </div>
+      )
+    }
+
+    <div class="wrap">
+      <div class="prose">
+        {/* Every card is handed in here, so a story file needs no
+            imports of its own — see src/lib/story-components.ts. */}
+        <Content components={storyComponents} />
+      </div>
+    </div>
+
+    <div class="wrap wrap-mid">
+      <div class="post-footer">
+        <div class="post-footer-tags">
+          <a class="pill" href={`/collection/${collectionSlug(post.data.collection)}/`}>
+            {post.data.collection}
+          </a>
+          {post.data.tags.map((tag) => <a class="pill" href={`/tag/${tagSlug(tag)}/`}>{tag}</a>)}
+        </div>
+
+        <div class="post-footer-actions">
+          {siteConfig.post.showShare && <ShareButton title={post.data.title} url={shareUrl} />}
+        </div>
+      </div>
+    </div>
+  </article>
+
+  {
+    related.length > 0 && (
+      <section class="wrap section" aria-labelledby="more-work">
+        <div class="post-related-head">
+          <h2 class="title-lg" id="more-work" data-reveal="up">
+            {strings.story.more(post.data.collection)}
+          </h2>
+          <a class="arrow-link" href={`/collection/${collectionSlug(post.data.collection)}/`}>
+            <span>{strings.seeAll}</span>
+          </a>
+        </div>
+
+        <Wall posts={related} columns={3} eagerCount={0} />
+      </section>
+    )
+  }
+
+  {next && <PostNext post={next} />}
+
+  {siteConfig.post.showShare && <ShareSheet title={post.data.title} url={shareUrl} />}
+  <ProseRuntime />
+</PageLayout>

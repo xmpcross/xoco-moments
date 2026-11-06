@@ -1,0 +1,71 @@
+---
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import { lookupOpenGraph } from "@/lib/open-graph";
+
+/**
+ * A link out, given the weight of a card. The whole thing is one link, so
+ * nothing inside it is separately focusable.
+ *
+ * A bookmark only needs a URL: the picture, the title and the description
+ * come from the linked page's own Open Graph tags, read at build time by
+ * `src/lib/open-graph.ts`. Anything written by hand wins over what was
+ * fetched, and a card written out in full makes no request at all.
+ */
+interface Props {
+  url: string;
+  title?: string;
+  description?: string;
+  /** Defaults to the linked page's own site name, then its hostname. */
+  site?: string;
+  /** Absolute URL, normally the linked page's og:image. */
+  image?: string;
+}
+
+const { url, ...written } = Astro.props;
+const host = new URL(url).hostname;
+const hostName = host.replace(/^www\./, "");
+
+const complete = written.title && written.description && written.image;
+const fetched = !complete && siteConfig.fetchBookmarkPreviews ? await lookupOpenGraph(url) : {};
+
+const title = written.title ?? fetched.title ?? hostName;
+const description = written.description ?? fetched.description;
+const image = written.image ?? fetched.image;
+const source = written.site ?? fetched.siteName ?? hostName;
+/* Decided at build time rather than by a script: a link that leaves the site
+   should say so in the markup, not once JavaScript has run. */
+const external = host !== new URL(siteConfig.siteUrl).hostname;
+---
+
+<a
+  class="card card-bookmark"
+  href={url}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noreferrer noopener" : undefined}
+>
+  <span class="card-bookmark-body">
+    <span class="card-bookmark-title">{title}</span>
+    {description && <span class="card-bookmark-description">{description}</span>}
+    <span class="card-bookmark-meta">
+      <span>{source}</span>
+      {external && <span class="sr-only">{strings.cards.opensInNewTab}</span>}
+    </span>
+  </span>
+
+  {
+    image && (
+      <span class="card-bookmark-thumb">
+        {/*
+         * A plain remote <img>, not astro:assets. Downloading it at build
+         * would turn the other site's future 404 into a failed build of
+         * yours; `lazy` means a card nobody scrolls to costs nothing, and
+         * no-referrer keeps the reader's page out of that site's logs. The
+         * alt is empty because the title beside it already says where the
+         * link goes.
+         */}
+        <img src={image} alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+      </span>
+    )
+  }
+</a>

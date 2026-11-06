@@ -1,0 +1,28 @@
+---
+/**
+ * The opening of a page that is not a story: a title, one line under it, and
+ * whatever the page wants to put beside them.
+ */
+interface Props {
+  title: string;
+  lede?: string;
+  /** A count, a description, a row of pills — rendered in the second column. */
+  class?: string;
+}
+
+const { title, lede, class: className } = Astro.props;
+const hasAside = Astro.slots.has("aside");
+---
+
+<section class:list={["wrap", "archive-head", className]}>
+  <div class="archive-head-inner">
+    <div>
+      <h1 class="title-xl archive-title" data-reveal="up">{title}</h1>
+      {lede && <p class="lede archive-count" data-reveal="up">{lede}</p>}
+    </div>
+
+    {hasAside && <div data-reveal="up"><slot name="aside" /></div>}
+  </div>
+
+  <slot />
+</section>

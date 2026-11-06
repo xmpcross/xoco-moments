@@ -1,0 +1,80 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { strings } from "@/config/strings";
+import { lightboxRendition, postImage } from "@/lib/images";
+
+/**
+ * One photograph inside a story, with an optional caption and a
+ * click-to-enlarge view.
+ *
+ * There is no sidebar on a story, so a figure can break out of the reading
+ * column: `wide` goes to a comfortable picture width, `full` runs to the
+ * window edge. That alternation — a narrow column of words, then a run of
+ * photographs across the page — is the shape of the whole theme.
+ */
+interface Props {
+  /** An imported image, or a filename resolved against `folder`. */
+  src: ImageMetadata | string;
+  /** The story's folder under `src/content/posts/`, when `src` is a name. */
+  folder?: string;
+  alt: string;
+  caption?: string;
+  credit?: string;
+  width?: "regular" | "wide" | "full";
+  /**
+   * Lightbox group. Every photograph on a page shares one by default, so the
+   * arrows walk the whole story in the order it was written. Name a group to
+   * keep a set to itself.
+   */
+  group?: string;
+}
+
+const { src, folder, alt, caption, credit, width = "regular", group = "story" } = Astro.props;
+
+const image = typeof src === "string" ? postImage(src, folder) : src;
+
+const full = await lightboxRendition(image);
+
+const sizes = {
+  regular: "(min-width: 48rem) 608px, 94vw",
+  wide: "(min-width: 64rem) 1100px, 94vw",
+  full: "100vw",
+}[width];
+---
+
+<figure
+  class:list={["card", width === "wide" && "card-wide", width === "full" && "card-full"]}
+>
+  <button
+    class="figure-frame"
+    type="button"
+    data-lightbox
+    data-lightbox-group={group}
+    data-lightbox-src={full.src}
+    data-lightbox-srcset={full.srcSet.attribute}
+    data-lightbox-alt={alt}
+    data-lightbox-caption={caption ?? ""}
+    data-lightbox-credit={credit ?? ""}
+    aria-label={strings.lightbox.enlarge(alt)}
+  >
+    <Image
+      src={image}
+      alt={alt}
+      widths={[600, 900, 1200, 1600, 2000, 2400]}
+      sizes={sizes}
+      loading="lazy"
+      decoding="async"
+      data-autosize
+    />
+  </button>
+
+  {
+    (caption || credit) && (
+      <figcaption class="figure-caption">
+        {caption}
+        {credit && <span> {credit}</span>}
+      </figcaption>
+    )
+  }
+</figure>

@@ -1,0 +1,91 @@
+---
+import { Image } from "astro:assets";
+import { siteConfig } from "@/config/site";
+import { coverSizes } from "@/lib/images";
+import { formatDate, type Post } from "@/lib/posts";
+
+/**
+ * The opening photograph, at full window, with the collection, the place and
+ * the date over it.
+ *
+ * `editorial` is the alternative: the title on the page with the photograph
+ * at the width of the reading column under it. Use it for a studio note or an
+ * advice piece, where the words are the reason for the page.
+ */
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const editorial = post.data.storyLayout === "editorial";
+const meta = [
+  post.data.collection,
+  post.data.place,
+  formatDate(post.data.date, "long"),
+].filter(Boolean) as string[];
+---
+
+{
+  editorial ? (
+    <>
+      <header class="wrap wrap-mid post-head">
+        {siteConfig.post.showMeta && (
+          <p class="label label-soft meta-row post-kicker">
+            {meta.map((item) => (
+              <span>{item}</span>
+            ))}
+          </p>
+        )}
+        <h1 class="display post-head-title">{post.data.title}</h1>
+        <p class="lede page-head-lede">{post.data.excerpt}</p>
+      </header>
+
+      <div class="wrap">
+        <figure class="post-figure-inline" data-reveal="image">
+          <div class="media media-landscape">
+            <Image
+              src={post.data.cover.src}
+              alt={post.data.cover.alt}
+              widths={[800, 1200, 1600, 2000, 2400]}
+              sizes="100vw"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </div>
+          {post.data.cover.credit && (
+            <figcaption class="caption" style="padding-top:0.75rem">
+              {post.data.cover.credit}
+            </figcaption>
+          )}
+        </figure>
+      </div>
+    </>
+  ) : (
+    <header class="post-hero">
+      <div class="post-hero-media">
+        <Image
+          src={post.data.cover.src}
+          alt={post.data.cover.alt}
+          widths={[800, 1200, 1600, 2000, 2400]}
+          sizes={coverSizes(post.data.cover.src, 92)}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </div>
+      <div class="post-hero-scrim" />
+
+      <div class="wrap post-hero-body">
+        {siteConfig.post.showMeta && (
+          <p class="label meta-row post-kicker">
+            {meta.map((item) => (
+              <span>{item}</span>
+            ))}
+          </p>
+        )}
+        <h1 class="display post-hero-title">{post.data.title}</h1>
+      </div>
+    </header>
+  )
+}

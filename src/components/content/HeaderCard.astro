@@ -1,0 +1,29 @@
+---
+/**
+ * A full-width band, for the top of a page or a break between sections. It
+ * stays dark in both colour modes, so it reads as a pause in the page rather
+ * than as another surface.
+ */
+interface Props {
+  heading: string;
+  subheading?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+}
+
+const { heading, subheading, buttonText, buttonUrl } = Astro.props;
+---
+
+<aside class="card card-full card-header">
+  <h2 class="card-header-heading">{heading}</h2>
+  {subheading && <p class="card-header-sub">{subheading}</p>}
+  {
+    buttonText && buttonUrl && (
+      <p>
+        <a class="btn btn-outline" href={buttonUrl}>
+          <span>{buttonText}</span>
+        </a>
+      </p>
+    )
+  }
+</aside>

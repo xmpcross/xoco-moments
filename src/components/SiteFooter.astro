@@ -1,0 +1,91 @@
+---
+import LocalIcon from "@/components/LocalIcon.astro";
+import Wordmark from "@/components/Wordmark.astro";
+import SubscribeForm from "@/components/SubscribeForm.astro";
+import { footerNavigation, siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import { socialIconFor } from "@/lib/socials";
+
+/**
+ * The foot of every page: the mailing list at display size, the site's own
+ * columns under it, and one line of small print.
+ *
+ * `inverted` is the house default — a near-black band that closes the page
+ * the way the opening photograph starts it. `washed` and `plain` are the
+ * quieter alternatives.
+ */
+interface Props {
+  surface?: "inverted" | "washed" | "plain";
+}
+
+const { surface = "inverted" } = Astro.props;
+const year = new Date().getFullYear();
+const showSignup = siteConfig.newsletter.enabled;
+---
+
+<footer
+  class:list={[
+    "site-footer",
+    surface === "inverted" && "site-footer--inverted",
+    surface === "plain" && "site-footer--plain",
+  ]}
+>
+  {
+    showSignup && (
+      <div class="wrap">
+        <div class="site-footer-signup">
+          <div>
+            <h2 class="title-lg site-footer-signup-title">{siteConfig.newsletter.title}</h2>
+            <p class="lede" style="margin-top:1rem">
+              {siteConfig.newsletter.description}
+            </p>
+          </div>
+          <SubscribeForm id="footer-signup" />
+        </div>
+      </div>
+    )
+  }
+
+  <div class="wrap">
+    <div class="site-footer-grid">
+      <div class="site-footer-brand">
+        <a class="wordmark-link" href="/"><Wordmark class="wordmark-lg" /></a>
+        <p class="site-footer-description">{siteConfig.bio}</p>
+
+        <div class="site-footer-socials">
+          {
+            siteConfig.socials.map((social) => (
+              <a class="icon-btn" href={social.href} rel="me noopener" aria-label={social.label}>
+                <LocalIcon name={socialIconFor(social.label)} className="h-5 w-5" />
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      {
+        footerNavigation.map((group) => (
+          <nav class="site-footer-nav" aria-label={group.title}>
+            <p class="site-footer-heading">{group.title}</p>
+            <ul>
+              {group.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="site-footer-bottom">
+    <div class="wrap site-footer-bottom-inner">
+      <p class="site-footer-credits">
+        <span>&copy; {year} {siteConfig.name}. {strings.footer.rights}</span>
+      </p>
+      <p>{strings.footer.builtWith}</p>
+    </div>
+  </div>
+</footer>

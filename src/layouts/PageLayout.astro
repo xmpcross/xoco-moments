@@ -1,0 +1,48 @@
+---
+import AutoSizes from "@/components/AutoSizes.astro";
+import Lightbox from "@/components/content/Lightbox.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
+import SiteHeader from "@/components/SiteHeader.astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { ImageMetadata } from "astro";
+
+/**
+ * The page frame: the bar, the main landmark, the footer, and the one
+ * lightbox every photograph on the page opens into.
+ *
+ * `over` is for pages that open on a full-bleed photograph. It collapses the
+ * slot that normally reserves the header's height, so the picture starts at
+ * the very top of the window with the bar floating on it.
+ */
+interface Props {
+  over?: boolean;
+  title?: string;
+  description?: string;
+  image?: ImageMetadata | string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  article?: { published: Date; modified?: Date; section?: string; tags?: string[] };
+  noindex?: boolean;
+  prevUrl?: string;
+  nextUrl?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+  footerSurface?: "inverted" | "washed" | "plain";
+}
+
+const { over = false, footerSurface, ...meta } = Astro.props;
+---
+
+<BaseLayout {...meta}>
+  <div class="viewport">
+    <SiteHeader over={over} />
+
+    <main id="content" class="main">
+      <slot />
+    </main>
+
+    <SiteFooter surface={footerSurface} />
+  </div>
+
+  <Lightbox />
+  <AutoSizes />
+</BaseLayout>

@@ -1,0 +1,64 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+/**
+ * A note and a button, mid-story. Without a photograph the two sit on one
+ * row; handing it one stacks the picture beside the words instead.
+ */
+interface Props {
+  buttonText: string;
+  buttonUrl: string;
+  /** A small tracked label above the words. "Bookings", "Sponsored". */
+  label?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  /** "plain" drops the tinted panel for a pair of hairlines. */
+  surface?: "tinted" | "plain";
+}
+
+const { buttonText, buttonUrl, label, image, imageAlt = "", surface = "tinted" } = Astro.props;
+---
+
+<aside
+  class:list={[
+    "card",
+    "card-cta",
+    image ? "card-cta-stacked" : "card-cta-row",
+    surface === "plain" && "card-cta-plain",
+  ]}
+>
+  {
+    image && (
+      <div class="card-cta-media">
+        <Image src={image} alt={imageAlt} widths={[400, 720]} sizes="18rem" loading="lazy" />
+      </div>
+    )
+  }
+
+  <div class="card-cta-body">
+    {label && <p class="card-cta-label">{label}</p>}
+    <div class="card-cta-text"><slot /></div>
+    {
+      /* Inside the body when there is a picture, so the words and the button
+         stay one block beside it rather than becoming a third column. */
+      image && (
+        <p class="card-cta-foot">
+          <a class="btn btn-accent" href={buttonUrl}>
+            <span>{buttonText}</span>
+          </a>
+        </p>
+      )
+    }
+  </div>
+
+  {
+    !image && (
+      <p class="card-cta-foot">
+        <a class="btn btn-accent" href={buttonUrl}>
+          <span>{buttonText}</span>
+        </a>
+      </p>
+    )
+  }
+</aside>

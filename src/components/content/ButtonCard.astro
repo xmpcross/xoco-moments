@@ -1,0 +1,14 @@
+---
+/** One call to action, centred in the reading column. */
+interface Props {
+  href: string;
+  label: string;
+  variant?: "accent" | "outline";
+}
+
+const { href, label, variant = "accent" } = Astro.props;
+---
+
+<div class="card card-button">
+  <a class:list={["btn", `btn-${variant}`]} href={href}><span>{label}</span></a>
+</div>

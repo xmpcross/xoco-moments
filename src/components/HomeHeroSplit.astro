@@ -1,0 +1,59 @@
+---
+import { Image } from "astro:assets";
+import { strings } from "@/config/strings";
+import { formatDate, postHref, type Post } from "@/lib/posts";
+
+/**
+ * The quieter opening: the studio's own line on the page, one photograph
+ * beside it, both in the flow rather than filling the window. Picked with
+ * `heroStyle: "split"` in `src/config/site.ts`.
+ */
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+---
+
+<section class="wrap home-hero-split">
+  <div class="home-hero-split-body">
+    <p class="label label-soft meta-row" data-reveal="up">
+      <span>{post.data.collection}</span>
+      <span>{formatDate(post.data.date, "month")}</span>
+    </p>
+
+    <h2 class="title-xl" data-reveal="up">
+      <a href={postHref(post)}>{post.data.title}</a>
+    </h2>
+
+    <p class="lede" data-reveal="up">{post.data.excerpt}</p>
+
+    <a class="arrow-link" href={postHref(post)} data-reveal="up">
+      <span>{strings.home.seeTheDay}</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M5 12h13m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+  </div>
+
+  <div class="media" data-reveal="image">
+    <Image
+      src={post.data.cover.src}
+      alt={post.data.cover.alt}
+      widths={[600, 900, 1200, 1600]}
+      sizes="(min-width: 64rem) 55vw, 92vw"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      data-autosize
+    />
+  </div>
+</section>
+
+<script>
+  /* The split hero is the page's largest paint, so it never waits for the
+     reveal observer: it is on screen before anything can scroll. */
+  document
+    .querySelectorAll(".home-hero-split [data-reveal]")
+    .forEach((element) => element.classList.add("is-revealed"));
+</script>

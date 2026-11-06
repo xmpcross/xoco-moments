@@ -1,0 +1,34 @@
+---
+import logo from "@/assets/logo.svg?raw";
+import { siteConfig } from "@/config/site";
+
+/**
+ * The studio's mark, in the header, the drawer and the footer.
+ *
+ * To use your own, replace `src/assets/logo.svg` and change nothing else.
+ * Any aspect ratio works: the mark is sized by height and takes whatever
+ * width it needs.
+ *
+ * It is inlined rather than served as an `<img>` so it can take the ink of
+ * whatever it sits on — the page, the inverted footer, or a photograph under
+ * the floating header. A flat black or white fill in the file is stripped so
+ * that inheritance works in both colour modes; any other colour is left
+ * alone, so a logo with real brand colours keeps them.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+/* Also drops the editor `id` most drawing apps write, which would otherwise
+   repeat on every page that shows the mark more than once. */
+const svg = logo
+  .replace(/\s*style="\s*fill:\s*(?:#fff(?:fff)?|#000(?:000)?|white|black)\s*;?\s*"/gi, "")
+  .replace(/\s*fill="(?:#fff(?:fff)?|#000(?:000)?|white|black)"/gi, "")
+  .replace(/\s*id="[^"]*"/, "")
+  .replace("<svg", '<svg aria-hidden="true" focusable="false"');
+---
+
+<span class:list={["wordmark", className]} set:html={svg} />
+<span class="sr-only">{siteConfig.name}</span>

@@ -1,0 +1,28 @@
+---
+import { strings } from "@/config/strings";
+
+/**
+ * An audio file with the browser's own player. The native controls are
+ * keyboard accessible, follow the operating system's media keys, and cost
+ * nothing to ship, which a custom player cannot claim.
+ */
+interface Props {
+  /** A file in `public/`, or any absolute URL. */
+  src: string;
+  title: string;
+  /** Printed under the title. "3:12", "A sample recording". */
+  note?: string;
+}
+
+const { src, title, note } = Astro.props;
+---
+
+<figure class="card card-audio">
+  <div class="card-audio-body">
+    <p class="card-audio-title">{title}</p>
+    {note && <p class="card-file-caption">{note}</p>}
+    <audio controls preload="none" src={src}>
+      <a href={src}>{strings.cards.downloadAudio}</a>
+    </audio>
+  </div>
+</figure>

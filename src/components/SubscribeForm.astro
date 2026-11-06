@@ -1,0 +1,53 @@
+---
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+
+/**
+ * The mailing-list capture: one field, one button, on a rule.
+ *
+ * With no provider configured the field still works, so the band can be seen
+ * as it will look, but the submit is disabled and says why: an address typed
+ * into a form that goes nowhere is worse than no form.
+ */
+interface Props {
+  id: string;
+  showTerms?: boolean;
+  buttonLabel?: string;
+  class?: string;
+}
+
+const { id, showTerms = true, buttonLabel = strings.forms.signUp, class: className } = Astro.props;
+
+const newsletter = siteConfig.newsletter;
+const action = newsletter.action.trim();
+const isConfigured = newsletter.enabled && action.length > 0;
+const noteId = `${id}-note`;
+---
+
+<form
+  class:list={["subscribe-form", className]}
+  action={isConfigured ? action : undefined}
+  method={newsletter.method || "post"}
+  aria-describedby={noteId}
+>
+  <div>
+    <label class="sr-only" for={id}>{strings.forms.email}</label>
+    <input
+      id={id}
+      class="field"
+      type="email"
+      name={newsletter.emailFieldName || "email"}
+      autocomplete="email"
+      placeholder={strings.forms.emailPlaceholder}
+      required
+    />
+  </div>
+
+  <button type="submit" class="btn btn-accent" disabled={!isConfigured}>
+    <span>{buttonLabel}</span>
+  </button>
+
+  <p id={noteId} class:list={["form-note", !showTerms && "sr-only"]}>
+    {isConfigured ? newsletter.terms : strings.forms.newsletterUnset}
+  </p>
+</form>

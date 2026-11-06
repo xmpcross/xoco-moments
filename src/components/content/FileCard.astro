@@ -1,0 +1,26 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+
+/** A download: a price list, a contract, a location guide. */
+interface Props {
+  /** A file in `public/`, or any absolute URL. */
+  src: string;
+  title: string;
+  caption?: string;
+  /** "PDF · 240 KB". Written out rather than measured, so it stays honest. */
+  meta?: string;
+}
+
+const { src, title, caption, meta } = Astro.props;
+---
+
+<a class="card card-file" href={src} download>
+  <span class="card-file-icon" aria-hidden="true">
+    <Icon name="file" />
+  </span>
+  <span class="card-file-body">
+    <span class="card-file-title">{title}</span>
+    {caption && <span class="card-file-caption">{caption}</span>}
+    {meta && <span class="card-file-meta">{meta}</span>}
+  </span>
+</a>

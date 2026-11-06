@@ -1,0 +1,26 @@
+---
+/**
+ * A short aside set off from the prose. The tints are mixed from the theme's
+ * own tokens rather than fixed pastels, so each one holds in both colour
+ * modes instead of glowing on a dark page.
+ */
+interface Props {
+  /** Grey separates, blue informs, yellow cautions, accent is the brand. */
+  tone?: "grey" | "blue" | "green" | "yellow" | "red" | "pink" | "purple" | "accent";
+  /** A single character. Leave it out for a callout with no mark. */
+  emoji?: string;
+}
+
+const { tone = "grey", emoji } = Astro.props;
+---
+
+<aside class:list={["card", "card-callout", `card-callout-${tone}`]}>
+  {
+    emoji && (
+      <span class="card-callout-emoji" aria-hidden="true">
+        {emoji}
+      </span>
+    )
+  }
+  <div><slot /></div>
+</aside>

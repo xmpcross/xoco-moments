@@ -1,0 +1,73 @@
+---
+/**
+ * Corrects `sizes` to what an image is actually rendered at.
+ *
+ * A justified gallery decides its slot widths at runtime, and a masonry
+ * column's width depends on how many columns the wall ended up with, so no
+ * `sizes` attribute written at build time can be right for both. A frame
+ * claiming 34vw while occupying 66vw is served half the pixels it needs and
+ * looks soft, which on a photography site is the one thing that cannot be
+ * allowed.
+ *
+ * A cropped photograph has a second trap: a landscape picture filling a tall
+ * tile is scaled by the tile's height, not its width, so the rendition it
+ * needs is wider than the tile. The required width is worked out from the
+ * box and the photograph's own proportions.
+ *
+ * So every image marked `data-autosize` has its `sizes` set to its measured
+ * need. Browsers never downgrade a candidate they have already chosen, so
+ * this only ever corrects upwards.
+ */
+---
+
+<script>
+  const apply = (image: HTMLImageElement) => {
+    const box = image.getBoundingClientRect();
+    if (!box.width) return;
+
+    let width = box.width;
+    const natural = Number(image.getAttribute("width")) / Number(image.getAttribute("height"));
+    if (natural && getComputedStyle(image).objectFit === "cover") {
+      width = Math.max(width, box.height * natural);
+    }
+
+    /* Rounded up to a step so a pixel of reflow does not rewrite the
+       attribute, and with it re-run the browser's candidate selection. */
+    const stepped = Math.ceil(width / 40) * 40;
+    const next = `${stepped}px`;
+    if (image.sizes === next) return;
+    image.sizes = next;
+  };
+
+  const images = document.querySelectorAll<HTMLImageElement>("img[data-autosize]");
+
+  if (images.length) {
+    const run = () => images.forEach(apply);
+
+    /* Run after the wall and the galleries have laid themselves out: both
+       listen for the same load event, and both are registered before this. */
+    run();
+    window.addEventListener("load", run);
+
+    if (typeof ResizeObserver === "function") {
+      const observer = new ResizeObserver((entries) => {
+        entries.forEach((entry) => apply(entry.target as HTMLImageElement));
+      });
+      images.forEach((image) => observer.observe(image));
+    } else {
+      let queued = false;
+      window.addEventListener(
+        "resize",
+        () => {
+          if (queued) return;
+          queued = true;
+          window.requestAnimationFrame(() => {
+            queued = false;
+            run();
+          });
+        },
+        { passive: true },
+      );
+    }
+  }
+</script>

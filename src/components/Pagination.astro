@@ -1,0 +1,77 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import { strings } from "@/config/strings";
+
+/**
+ * Numbered pages under a wall. Long runs are elided to first, last and the
+ * pages either side of the current one, so a forty-page archive does not
+ * print forty links.
+ */
+interface Props {
+  prevUrl?: string;
+  nextUrl?: string;
+  currentPage: number;
+  lastPage: number;
+  /** "/work/", "/collection/weddings/". Page one lives at the base. */
+  base: string;
+  label: string;
+}
+
+const { prevUrl, nextUrl, currentPage, lastPage, base, label } = Astro.props;
+
+const href = (page: number) => (page === 1 ? base : `${base}${page}/`);
+
+/* Always the first and last page, plus the current one and its neighbours.
+   Everything else collapses into a gap. */
+const shown = new Set(
+  [1, lastPage, currentPage - 1, currentPage, currentPage + 1].filter(
+    (page) => page >= 1 && page <= lastPage,
+  ),
+);
+const pages = [...shown].sort((a, b) => a - b);
+---
+
+{
+  lastPage > 1 && (
+    <nav class="pagination" aria-label={label}>
+      <div class="pagination-side">
+        {prevUrl && (
+          <a class="btn btn-outline btn-sm" href={prevUrl} rel="prev">
+            <Icon name="arrow-left" size={12} />
+            <span>{strings.pagination.previous}</span>
+          </a>
+        )}
+      </div>
+
+      <div class="pagination-pages">
+        {pages.map((page, index) => (
+          <>
+            {index > 0 && page - pages[index - 1] > 1 && (
+              <span class="pagination-gap" aria-hidden="true">
+                …
+              </span>
+            )}
+            {page === currentPage ? (
+              <span class="pagination-current" aria-current="page">
+                {page}
+              </span>
+            ) : (
+              <a class="pagination-page" href={href(page)} aria-label={strings.pagination.page(page)}>
+                {page}
+              </a>
+            )}
+          </>
+        ))}
+      </div>
+
+      <div class="pagination-side">
+        {nextUrl && (
+          <a class="btn btn-outline btn-sm" href={nextUrl} rel="next">
+            <span>{strings.pagination.next}</span>
+            <Icon name="arrow-right" size={12} />
+          </a>
+        )}
+      </div>
+    </nav>
+  )
+}

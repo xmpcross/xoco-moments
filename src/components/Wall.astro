@@ -1,0 +1,224 @@
+---
+import Tile from "@/components/Tile.astro";
+import { siteConfig } from "@/config/site";
+import type { Post } from "@/lib/posts";
+
+/**
+ * The wall of work: the front page grid, the Work page, and the collection
+ * and tag archives all render through here.
+ *
+ * Without JavaScript it is a plain equal-column grid, each tile cropped to the
+ * ratio the nth-child pattern in `global.css` gives it. The script below then
+ * redistributes the tiles into columns of its own, shortest column first,
+ * which closes the ragged bottom edge that equal-height rows leave when every
+ * photograph is a different shape. The ratios are read from the stylesheet
+ * before anything moves, so the pattern is defined in exactly one place and
+ * still applies when the script does not run.
+ */
+interface Props {
+  posts: Post[];
+  columns?: 2 | 3 | 4;
+  /** "masonry" keeps every photograph at its own height; "uniform" crops. */
+  style?: "masonry" | "uniform";
+  /** Tiles loaded eagerly. Defaults to the first row plus the tile that usually starts the next. */
+  eagerCount?: number;
+  /**
+   * Tiles given `fetchpriority="high"`. Zero when something above the wall,
+   * such as the hero, is the page's largest paint.
+   */
+  priorityCount?: number;
+  sizes?: string;
+  headingLevel?: "h2" | "h3";
+}
+
+const {
+  posts,
+  columns = siteConfig.gridColumns,
+  style = siteConfig.gridStyle,
+  eagerCount = columns + 1,
+  priorityCount = 2,
+  sizes,
+  headingLevel = "h3",
+} = Astro.props;
+
+const masonry = style === "masonry";
+---
+
+<div
+  class:list={["grid", `grid-${columns}`, masonry && "grid-masonry"]}
+  data-masonry={masonry ? "" : undefined}
+  data-reveal-group="40"
+>
+  {
+    posts.map((post, index) => (
+      <Tile
+        post={post}
+        eager={index < eagerCount}
+        priority={index < Math.min(eagerCount, priorityCount)}
+        sizes={sizes}
+        headingLevel={headingLevel}
+      />
+    ))
+  }
+</div>
+
+<script>
+  /*
+   * Column arithmetic. Items are dealt into columns, always into whichever is
+   * currently shortest, so reading order still runs left to right along the
+   * top. Heights are predicted from each tile's aspect ratio rather than
+   * measured, so nothing is read back from the layout mid-deal.
+   *
+   * Once dealt, every column is brought to one height by scaling its tiles a
+   * few percent each. The photographs are cropped to their frames anyway, so a
+   * frame at 4:5.3 instead of 4:5 is invisible and the wall ends on one line.
+   */
+  interface Column {
+    items: number[];
+    height: number;
+  }
+
+  /** Height per unit of width for each item, dealt into `count` columns. */
+  const deal = (ratios: number[], count: number): Column[] => {
+    const columns: Column[] = Array.from({ length: count }, () => ({ items: [], height: 0 }));
+
+    ratios.forEach((ratio, index) => {
+      let shortest = columns[0];
+      columns.forEach((column) => {
+        if (column.height < shortest.height - 0.001) shortest = column;
+      });
+      shortest.items.push(index);
+      shortest.height += ratio;
+    });
+
+    return columns;
+  };
+
+  const pixelHeight = (column: Column, width: number, gap: number) =>
+    column.items.length ? width * column.height + gap * (column.items.length - 1) : 0;
+
+  /*
+   * Heights are in units of column width, but the gaps between tiles are fixed
+   * pixels, so a column with more tiles has less room for photographs. Every
+   * column is brought to the mean pixel height, which halves the worst crop
+   * compared with stretching everything up to the tallest.
+   *
+   * Only the columns that were dealt something count towards the mean. A
+   * collection holding one story would otherwise average its photograph
+   * against two empty columns and squash it to a third of its height.
+   */
+  const balance = (columns: Column[], width: number, gap: number) => {
+    const filled = columns.filter((column) => column.items.length);
+    if (!filled.length) return columns.map(() => 1);
+
+    const heights = filled.map((column) => pixelHeight(column, width, gap));
+    const target = heights.reduce((sum, height) => sum + height, 0) / heights.length;
+
+    return columns.map((column) =>
+      column.height ? (target - gap * (column.items.length - 1)) / (width * column.height) : 1,
+    );
+  };
+
+  const ratioOf = (tile: HTMLElement) => {
+    const media = tile.querySelector<HTMLElement>(".tile-media");
+    if (!media) return 1;
+
+    const raw = getComputedStyle(media).getPropertyValue("--tile-ratio").trim();
+    const [width, height] = raw.split("/").map((part) => Number.parseFloat(part));
+    return width && height ? height / width : 1;
+  };
+
+  const setRatio = (tile: HTMLElement, ratio: number) => {
+    tile.querySelector<HTMLElement>(".tile-media")?.style.setProperty("--tile-ratio", `1 / ${ratio}`);
+  };
+
+  const columnsFor = (grid: HTMLElement) => {
+    const count = Number.parseInt(getComputedStyle(grid).getPropertyValue("--grid-cols"), 10);
+    return Number.isFinite(count) && count > 0 ? count : 1;
+  };
+
+  interface Board {
+    grid: HTMLElement;
+    tiles: HTMLElement[];
+    ratios: number[];
+    count: number;
+    columns: Column[];
+    elements: HTMLElement[];
+  }
+
+  const layout = (board: Board) => {
+    const count = columnsFor(board.grid);
+
+    if (board.count !== count) {
+      board.count = count;
+      board.grid.querySelectorAll(".grid-column").forEach((column) => column.remove());
+
+      // One column is the source order; the grid does that already.
+      if (count < 2) {
+        board.grid.classList.remove("is-columned");
+        board.tiles.forEach((tile, index) => {
+          setRatio(tile, board.ratios[index]);
+          board.grid.append(tile);
+        });
+        board.columns = [];
+        return;
+      }
+
+      board.columns = deal(board.ratios, count);
+      board.elements = board.columns.map((column) => {
+        const element = document.createElement("div");
+        element.className = "grid-column";
+        element.append(...column.items.map((index) => board.tiles[index]));
+        return element;
+      });
+
+      board.grid.classList.add("is-columned");
+      board.grid.append(...board.elements);
+    }
+
+    if (count < 2) return;
+
+    const width = board.elements[0].getBoundingClientRect().width;
+    const gap = Number.parseFloat(getComputedStyle(board.elements[0]).rowGap) || 0;
+    if (!width) return;
+
+    balance(board.columns, width, gap).forEach((scale, n) => {
+      board.columns[n].items.forEach((index) =>
+        setRatio(board.tiles[index], board.ratios[index] * scale),
+      );
+    });
+  };
+
+  const grids = document.querySelectorAll<HTMLElement>("[data-masonry]");
+
+  if (grids.length) {
+    const boards: Board[] = [...grids].map((grid) => {
+      const tiles = [...grid.querySelectorAll<HTMLElement>(".tile")];
+      const ratios = tiles.map(ratioOf);
+
+      /* The pattern is nth-child based, so it stops applying the moment a tile
+         moves into a column. Pinning each ratio inline keeps the shape it was
+         dealt. */
+      tiles.forEach((tile, index) => setRatio(tile, ratios[index]));
+
+      return { grid, tiles, ratios, count: 0, columns: [], elements: [] };
+    });
+
+    const run = () => boards.forEach(layout);
+    run();
+
+    let queued = false;
+    window.addEventListener(
+      "resize",
+      () => {
+        if (queued) return;
+        queued = true;
+        window.requestAnimationFrame(() => {
+          queued = false;
+          run();
+        });
+      },
+      { passive: true },
+    );
+  }
+</script>

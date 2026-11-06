@@ -1,0 +1,71 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { strings } from "@/config/strings";
+
+/**
+ * The dark panel on the front page: one photograph, the studio's own words,
+ * and a short row of figures.
+ *
+ * The figures are counted from what the site actually holds — how many
+ * stories, and the year of the oldest one — rather than typed into a
+ * setting, so they cannot go stale.
+ */
+interface Props {
+  title: string;
+  text: string;
+  href: string;
+  linkLabel?: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  figures?: { label: string; value: string | number }[];
+}
+
+const {
+  title,
+  text,
+  href,
+  linkLabel = strings.readMore,
+  image,
+  imageAlt,
+  figures = [],
+} = Astro.props;
+---
+
+<section class="home-studio">
+  <div class="wrap">
+    <div class="home-studio-inner">
+      <div class="media home-studio-media" data-reveal="image">
+        <Image
+          src={image}
+          alt={imageAlt}
+          widths={[600, 900, 1200, 1600]}
+          sizes="(min-width: 64rem) 46vw, 92vw"
+          loading="lazy"
+          decoding="async"
+          data-autosize
+        />
+      </div>
+
+      <div class="home-studio-body">
+        <h2 class="title-xl" data-reveal="up">{title}</h2>
+        <p class="home-studio-text" data-reveal="up">{text}</p>
+
+        <a class="btn btn-outline" href={href} data-reveal="up"><span>{linkLabel}</span></a>
+
+        {
+          figures.length > 0 && (
+            <dl class="home-studio-figures" data-reveal="up">
+              {figures.map((figure) => (
+                <div class="home-studio-figure">
+                  <dt>{figure.label}</dt>
+                  <dd>{figure.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>

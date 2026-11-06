@@ -1,0 +1,250 @@
+---
+import Audio from "@/components/content/Audio.astro";
+import Bookmark from "@/components/content/Bookmark.astro";
+import ButtonCard from "@/components/content/ButtonCard.astro";
+import CTA from "@/components/content/CTA.astro";
+import Callout from "@/components/content/Callout.astro";
+import Embed from "@/components/content/Embed.astro";
+import Figure from "@/components/content/Figure.astro";
+import FileCard from "@/components/content/FileCard.astro";
+import Gallery from "@/components/content/Gallery.astro";
+import HeaderCard from "@/components/content/HeaderCard.astro";
+import ProseRuntime from "@/components/content/ProseRuntime.astro";
+import Product from "@/components/content/Product.astro";
+import Quote from "@/components/content/Quote.astro";
+import SignupCard from "@/components/content/SignupCard.astro";
+import Toggle from "@/components/content/Toggle.astro";
+import PageLayout from "@/layouts/PageLayout.astro";
+
+import cover from "@/content/posts/elena-and-marc-cap-de-formentor/cover.jpg";
+import g2 from "@/content/posts/elena-and-marc-cap-de-formentor/g2.webp";
+import g4 from "@/content/posts/elena-and-marc-cap-de-formentor/g4.webp";
+import s1 from "@/content/posts/amara-and-theo-the-long-table/g1.webp";
+import s2 from "@/content/posts/amara-and-theo-the-long-table/g2.webp";
+import s3 from "@/content/posts/amara-and-theo-the-long-table/g3.webp";
+import s4 from "@/content/posts/amara-and-theo-the-long-table/g4.webp";
+import s5 from "@/content/posts/amara-and-theo-the-long-table/g5.webp";
+import s6 from "@/content/posts/amara-and-theo-the-long-table/g6.webp";
+
+/**
+ * Every element the theme styles, in one place, in the same reading column a
+ * story uses — so a card here reads exactly as it will in a post.
+ *
+ * Copy the frontmatter and the components straight out of this page's source
+ * when you write your own: each block below is the component, its props, and
+ * nothing else.
+ */
+---
+
+<PageLayout
+  title="Styleguide"
+  description="Every element the theme styles, in one place."
+  noindex
+>
+  <header class="wrap wrap-mid page-head">
+    <h1 class="display page-head-title" data-reveal="up">Styleguide</h1>
+    <p class="lede page-head-lede" data-reveal="up">
+      Every block a story can carry, styled by the theme. Open this page's source to see how each
+      one is written.
+    </p>
+  </header>
+
+  <div class="wrap section-tight">
+    <div class="prose">
+      <h2>Headings</h2>
+      <h1>Heading one</h1>
+      <h2>Heading two</h2>
+      <h3>Heading three</h3>
+      <h4>Heading four</h4>
+      <h5>Heading five</h5>
+      <h6>Heading six</h6>
+
+      <h2>Text</h2>
+      <p>
+        Body copy sits at a comfortable measure, with the display face kept for titles. It carries
+        <strong>bold</strong> and <em>italic</em> emphasis, <code>inline code</code>, and
+        <a href="https://astro.build">links</a> that pick up the accent colour.
+      </p>
+
+      <h2>Quotes</h2>
+      <Quote attribution="James">Nobody clapped. The silence was better.</Quote>
+      <p>The alternative style centres the quote and gives it its own marks.</p>
+      <Quote variant="alt">We forgot you were there, which I think was the point.</Quote>
+
+      <h2>Lists</h2>
+      <ul>
+        <li>Unordered lists take a marker in the accent colour</li>
+        <li>Items wrap against a hanging indent</li>
+        <li>Spacing matches the body rhythm</li>
+      </ul>
+      <ol>
+        <li>Numbered lists share the same measure</li>
+        <li>The counter sits outside the text column</li>
+        <li>Long items stay aligned</li>
+      </ol>
+
+      <hr />
+
+      <h2>Tables</h2>
+      <p>
+        A table scrolls inside its own frame when a narrow screen cannot hold it, so it never drags
+        the page sideways.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Collection</th>
+            <th>Stories</th>
+            <th>Typical length</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Weddings</td>
+            <td>14</td>
+            <td>A full day</td>
+          </tr>
+          <tr>
+            <td>Portraits</td>
+            <td>4</td>
+            <td>Two hours</td>
+          </tr>
+          <tr>
+            <td>Studio notes</td>
+            <td>2</td>
+            <td>Half a day</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Photographs</h2>
+      <p>A regular figure sits at the width of the reading column.</p>
+      <Figure
+        src={g2}
+        alt="Bride in a lace gown at sunset, the groom behind her."
+        caption="Regular width. Click it to open the lightbox."
+        group="styleguide"
+      />
+      <p>A wide figure breaks out of the column, and a full one runs to the window edge.</p>
+      <Figure src={g4} alt="A couple on a beach at sunset." caption="Wide." width="wide" group="styleguide" />
+      <Figure
+        src={cover}
+        alt="Bride and groom embracing beneath sunlit stone arches."
+        caption="Full width."
+        width="full"
+        group="styleguide"
+      />
+
+      <h2>Galleries</h2>
+      <p>
+        A gallery packs its frames into justified rows by their own proportions, so no photograph
+        is cropped to fit a grid. Every row runs the full window at one height. Clicking a frame
+        opens the lightbox scoped to that gallery, with arrows, the keyboard and swipe.
+      </p>
+      <Gallery
+        group="styleguide-gallery"
+        caption="Six frames, packed into rows. Resize the window and the rows repack."
+        images={[
+          { src: s1, alt: "A long table laid for dinner on a terrace." },
+          { src: s2, alt: "Place settings and folded linen." },
+          { src: s3, alt: "Guests raising glasses at dusk." },
+          { src: s4, alt: "Candles down the centre of a table." },
+          { src: s5, alt: "A cake on a side table." },
+          { src: s6, alt: "The terrace after dark, lit by bulbs." },
+        ]}
+      />
+
+      <h2>Callouts</h2>
+      <Callout tone="grey" emoji="📷">
+        <p>Grey is the quiet one, for a note that only needs separating from the prose.</p>
+      </Callout>
+      <Callout tone="blue" emoji="💡">
+        <p>Blue reads as information: context, a definition, a piece of background.</p>
+      </Callout>
+      <Callout tone="yellow" emoji="⚠️">
+        <p>Yellow is the caution, for a caveat a reader should not miss.</p>
+      </Callout>
+      <Callout tone="accent" emoji="✸">
+        <p>Accent takes the brand colour set in the stylesheet.</p>
+      </Callout>
+
+      <h2>Toggles</h2>
+      <Toggle heading="A toggle hides detail until it is asked for">
+        <p>
+          Useful for a list of what is included, a long caveat, or the answer to a question only
+          some readers have.
+        </p>
+      </Toggle>
+      <Toggle heading="Several can sit together as a short FAQ">
+        <p>Each one opens on its own, so a reader can take only the part they came for.</p>
+      </Toggle>
+
+      <h2>Bookmarks</h2>
+      <p>
+        A bookmark only needs a URL. The picture, the title and the description are read from the
+        linked page's own Open Graph tags at build time, and a page that has none falls back to a
+        plain card.
+      </p>
+      <Bookmark url="https://astro.build/" />
+
+      <h2>Audio</h2>
+      <Audio
+        src="/media/sample-audio.wav"
+        title="A sample recording"
+        note="Three seconds, for the shape of the player."
+      />
+
+      <h2>Files</h2>
+      <FileCard
+        src="/files/sample-document.pdf"
+        title="A sample document"
+        caption="What a downloadable price list or contract looks like in the reading column."
+        meta="PDF · 1 KB"
+      />
+
+      <h2>Buttons</h2>
+      <ButtonCard href="/contact/" label="A button card" />
+
+      <h2>Products</h2>
+      <Product
+        title="The full day"
+        description="From the quiet of the morning to whenever the music stops, with a second photographer from the ceremony onwards."
+        buttonText="Enquire"
+        buttonUrl="/contact/"
+        rating={5}
+      />
+
+      <h2>Call to action</h2>
+      <p>
+        The call to action card takes a note and a button. Handing it a photograph stacks the
+        picture beside the words instead of keeping them on one row.
+      </p>
+      <CTA label="Bookings" buttonText="Check a date" buttonUrl="/contact/">
+        <p>Dates for next summer are open. Most weekends go by the autumn before.</p>
+      </CTA>
+
+      <h2>Embeds</h2>
+      <Embed
+        src="https://www.youtube-nocookie.com/embed/EQ8ViYIeH04"
+        title="A sample video embed"
+        caption="Video keeps a 16:9 box, so nothing jumps as it loads."
+      />
+
+      <h2>Signup and header cards</h2>
+      <p>Both run the full width of the window, for the top of a page or a break between sections.</p>
+      <SignupCard
+        heading="New work, a few times a year"
+        subheading="No newsletter about newsletters. Just the pictures."
+        id="styleguide-signup"
+      />
+      <HeaderCard
+        heading="A header card"
+        subheading="Full width, dark in both colour modes, with an optional button."
+        buttonText="With a button"
+        buttonUrl="/contact/"
+      />
+    </div>
+  </div>
+
+  <ProseRuntime />
+</PageLayout>

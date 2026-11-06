@@ -1,0 +1,81 @@
+---
+import { Image } from "astro:assets";
+import ProseRuntime from "@/components/content/ProseRuntime.astro";
+import { siteConfig } from "@/config/site";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { breadcrumbSchema } from "@/lib/schema";
+import studioImage from "@/assets/studio.webp";
+
+/**
+ * The studio page. Its prose sits in a reading column that starts where the
+ * title does rather than centring like a story, which also pins everything in
+ * it to the column width: this is a page about the work, not a run of
+ * photographs.
+ */
+const schema = breadcrumbSchema([
+  { name: siteConfig.name, href: "/" },
+  { name: "Studio", href: "/studio/" },
+]);
+---
+
+<PageLayout
+  title="Studio"
+  description="One photographer, weddings and portraits across Europe, mostly on film."
+  structuredData={schema}
+>
+  <header class="wrap wrap-mid page-head">
+    <h1 class="display page-head-title" data-reveal="up">Studio</h1>
+    <p class="lede page-head-lede" data-reveal="up">
+      One photographer, weddings and portraits across Europe, mostly on film.
+    </p>
+  </header>
+
+  <div class="wrap">
+    <div class="media media-panorama" data-reveal="image">
+      <Image
+        src={studioImage}
+        alt={siteConfig.studioImageAlt}
+        widths={[800, 1200, 1600, 2000]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </div>
+  </div>
+
+  <div class="wrap wrap-mid section-tight">
+    <div class="prose prose-page">
+      <p>
+        {siteConfig.name} is one photographer. I take somewhere between twelve and fifteen weddings
+        a year, which is as many as I can shoot without any of them becoming a routine, and portrait
+        sessions in the months between.
+      </p>
+
+      <h2>How I work</h2>
+      <p>
+        I arrive early, stay late, and spend most of the day out of the way. There is no shot list.
+        Family portraits happen because they matter to your parents, and they take twenty minutes,
+        not two hours.
+      </p>
+      <p>
+        Around a third of every wedding is made on film and developed by a lab in Vilnius.
+        Everything is photographed digitally alongside it.
+      </p>
+
+      <h2>What you receive</h2>
+      <p>
+        Between four and six hundred edited frames, delivered in ten weeks, in an online gallery
+        that stays up for good. Print files are included and always will be.
+      </p>
+
+      <h2>Travel</h2>
+      <p>
+        I am based in Lisbon and work across Europe. Travel within the EU is included in every
+        full-day commission.
+      </p>
+
+    </div>
+  </div>
+
+  <ProseRuntime />
+</PageLayout>

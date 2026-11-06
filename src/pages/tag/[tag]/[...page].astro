@@ -1,0 +1,86 @@
+---
+import { getCollection } from "astro:content";
+import type { GetStaticPaths, Page } from "astro";
+import PageHeader from "@/components/PageHeader.astro";
+import Pagination from "@/components/Pagination.astro";
+import Wall from "@/components/Wall.astro";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { getAllTags, getByTag, tagSlug, usedCollections, visiblePosts, type Post } from "@/lib/posts";
+import { breadcrumbSchema } from "@/lib/schema";
+
+/** A tag: the same wall, filtered to the stories that carry one extra name. */
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = visiblePosts(await getCollection("posts"));
+
+  return getAllTags(posts).flatMap((tag) => {
+    const entries = getByTag(posts, tagSlug(tag));
+    if (!entries.length) return [];
+
+    return paginate(entries, {
+      params: { tag: tagSlug(tag) },
+      pageSize: siteConfig.postsPerPage,
+      props: { tag, posts },
+    });
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+  tag: string;
+  posts: Post[];
+}
+
+const { page, tag, posts } = Astro.props;
+const base = `/tag/${tagSlug(tag)}/`;
+const total = getByTag(posts, tagSlug(tag)).length;
+const collections = usedCollections(posts);
+const { archive } = strings;
+const title = archive.tagged(tag);
+
+const schema = breadcrumbSchema([
+  { name: siteConfig.name, href: "/" },
+  { name: archive.work, href: "/work/" },
+  { name: tag, href: base },
+]);
+---
+
+<PageLayout
+  title={page.currentPage > 1 ? archive.pageTitle(title, page.currentPage) : title}
+  description={archive.taggedDescription(tag)}
+  prevUrl={page.url.prev}
+  nextUrl={page.url.next}
+  structuredData={schema}
+>
+  <PageHeader title={tag} lede={archive.taggedLede(tag)}>
+    <p slot="aside" class="archive-count">
+      {archive.count(total)}
+      {page.lastPage > 1 && <> · {archive.pageOf(page.currentPage, page.lastPage)}</>}
+    </p>
+
+    <nav class="archive-filters" aria-label={archive.collections}>
+      <a class="pill" href="/work/">{archive.everything}</a>
+      {collections.map((entry) => <a class="pill" href={entry.href}>{entry.name}</a>)}
+    </nav>
+  </PageHeader>
+
+  <section class="wrap archive-feed">
+    {
+      page.data.length > 0 ? (
+        <Wall posts={page.data} headingLevel="h2" />
+      ) : (
+        <p class="archive-empty">{archive.empty}</p>
+      )
+    }
+
+    <Pagination
+      prevUrl={page.url.prev}
+      nextUrl={page.url.next}
+      currentPage={page.currentPage}
+      lastPage={page.lastPage}
+      base={base}
+      label={strings.pagination.label(tag)}
+    />
+  </section>
+</PageLayout>

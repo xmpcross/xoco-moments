@@ -1,0 +1,45 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import { strings } from "@/config/strings";
+
+/**
+ * A collection or a package: what it is, what it holds, and the one link that
+ * starts a conversation about it.
+ */
+interface Props {
+  title: string;
+  description: string;
+  buttonText?: string;
+  buttonUrl?: string;
+  /** Whole stars out of five. Leave it out for no rating row. */
+  rating?: number;
+}
+
+const { title, description, buttonText, buttonUrl, rating } = Astro.props;
+const stars = typeof rating === "number" ? [1, 2, 3, 4, 5] : [];
+---
+
+<div class="card card-product">
+  <h4 class="card-product-title">{title}</h4>
+  <p class="card-product-description">{description}</p>
+
+  {
+    stars.length > 0 && (
+      <p class="card-product-rating" role="img" aria-label={strings.cards.rating(rating ?? 0)}>
+        {stars.map((step) => (
+          <Icon name="star" class={step <= (rating ?? 0) ? "is-active" : undefined} />
+        ))}
+      </p>
+    )
+  }
+
+  {
+    buttonText && buttonUrl && (
+      <p class="card-product-foot">
+        <a class="btn btn-accent" href={buttonUrl}>
+          <span>{buttonText}</span>
+        </a>
+      </p>
+    )
+  }
+</div>

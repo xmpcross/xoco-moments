@@ -1,0 +1,155 @@
+---
+import LocalIcon from "@/components/LocalIcon.astro";
+import Wordmark from "@/components/Wordmark.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { primaryNavigation, secondaryNavigation, siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import { isCurrentPath } from "@/lib/navigation";
+import { socialIconFor } from "@/lib/socials";
+
+/**
+ * The menu on anything narrower than a desktop: the whole site in display
+ * type, the smaller routes under it, and the studio's accounts at the foot.
+ *
+ * Focus is trapped while it is open, because it is a modal panel over an
+ * inert page, and it is returned to the burger on close.
+ */
+const path = Astro.url.pathname;
+---
+
+<div class="menu-backdrop" data-drawer-backdrop hidden></div>
+
+<div
+  id="site-drawer"
+  class="menu-panel"
+  role="dialog"
+  aria-modal="true"
+  aria-label={strings.nav.menu}
+  hidden
+  data-drawer
+>
+  <div class="menu-panel-head">
+    <a class="wordmark-link" href="/"><Wordmark /></a>
+    <button type="button" class="icon-btn" data-drawer-close aria-label={strings.nav.closeMenu}>
+      <Icon name="close" size={20} />
+    </button>
+  </div>
+
+  <div class="menu-body">
+    <ul class="menu-list menu-list-primary">
+      {
+        primaryNavigation.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrentPath(path, item.href) ? "page" : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="menu-group">{strings.nav.more}</p>
+    <ul class="menu-list menu-list-secondary">
+      {
+        secondaryNavigation.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrentPath(path, item.href) ? "page" : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="menu-foot">
+      {
+        siteConfig.socials.map((social) => (
+          <a class="icon-btn" href={social.href} rel="me noopener" aria-label={social.label}>
+            <LocalIcon name={socialIconFor(social.label)} className="h-4 w-4" />
+          </a>
+        ))
+      }
+      <button type="button" class="icon-btn" data-theme-toggle aria-label={strings.nav.colourMode}>
+        <Icon name="sun" class="theme-icon-sun" />
+        <Icon name="moon" class="theme-icon-moon" />
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>("[data-drawer]");
+  const backdrop = document.querySelector<HTMLElement>("[data-drawer-backdrop]");
+  const openers = document.querySelectorAll<HTMLButtonElement>("[data-drawer-open]");
+
+  if (panel && backdrop && openers.length) {
+    const focusable =
+      'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    let opener: HTMLElement | null = null;
+
+    const isOpen = () => document.documentElement.classList.contains("has-open-menu");
+
+    const open = (from: HTMLElement) => {
+      opener = from;
+      panel.hidden = false;
+      backdrop.hidden = false;
+      /* The panel transitions from off-screen, so it has to be in the layout
+         for a frame before the class that moves it lands. */
+      void panel.getBoundingClientRect();
+      document.documentElement.classList.add("has-open-menu");
+      openers.forEach((button) => button.setAttribute("aria-expanded", "true"));
+      panel.querySelector<HTMLElement>(focusable)?.focus();
+    };
+
+    const close = () => {
+      if (!isOpen()) return;
+      document.documentElement.classList.remove("has-open-menu");
+      openers.forEach((button) => button.setAttribute("aria-expanded", "false"));
+      opener?.focus();
+
+      /* Hidden only once the slide has finished, or the panel disappears
+         mid-animation. */
+      window.setTimeout(() => {
+        if (isOpen()) return;
+        panel.hidden = true;
+        backdrop.hidden = true;
+      }, 600);
+    };
+
+    openers.forEach((button) => button.addEventListener("click", () => (isOpen() ? close() : open(button))));
+    panel.querySelector("[data-drawer-close]")?.addEventListener("click", close);
+    backdrop.addEventListener("click", close);
+    panel.addEventListener("click", (event) => {
+      if ((event.target as HTMLElement).closest("a")) close();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!isOpen()) return;
+
+      if (event.key === "Escape") {
+        close();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const items = [...panel.querySelectorAll<HTMLElement>(focusable)].filter(
+        (item) => item.offsetParent !== null,
+      );
+      if (!items.length) return;
+
+      const first = items[0];
+      const last = items[items.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    document.addEventListener("moments:close-drawer", close);
+  }
+</script>

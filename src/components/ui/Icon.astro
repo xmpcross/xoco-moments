@@ -1,0 +1,85 @@
+---
+/**
+ * Small stroked UI icons on a 24x24 grid. Chrome only — social and brand
+ * marks still come from `LocalIcon`.
+ *
+ * Every icon here is an outline, so the element carries `fill="none"` as an
+ * attribute. Never set `fill: currentcolor` on `svg` in CSS: it overrides the
+ * attribute and turns every one of them into a blob.
+ */
+export type IconName =
+  | "arrow-right"
+  | "arrow-left"
+  | "chevron-right"
+  | "chevron-down"
+  | "sun"
+  | "moon"
+  | "menu"
+  | "close"
+  | "play"
+  | "pause"
+  | "file"
+  | "share"
+  | "star"
+  | "check";
+
+interface Props {
+  name: IconName;
+  class?: string;
+  size?: number;
+}
+
+const { name, class: className, size = 16 } = Astro.props;
+/* The star is the one solid mark in the set: it is a badge, not an outline. */
+const filled = name === "star";
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={filled ? "currentColor" : "none"}
+  stroke={filled ? "none" : "currentColor"}
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {name === "arrow-right" && <path d="M5 12h13m-6-6 6 6-6 6" />}
+  {name === "arrow-left" && <path d="M19 12H6m6-6-6 6 6 6" />}
+  {name === "chevron-right" && <path d="m9 6 6 6-6 6" />}
+  {name === "chevron-down" && <path d="m6 9 6 6 6-6" />}
+  {
+    name === "sun" && (
+      <>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" />
+      </>
+    )
+  }
+  {name === "moon" && <path d="M20 14.2A7.4 7.4 0 0 1 9.8 4a8.6 8.6 0 1 0 10.2 10.2Z" />}
+  {name === "menu" && <path d="M4 7h16M4 12h16M4 17h16" />}
+  {name === "close" && <path d="m6 6 12 12M18 6 6 18" />}
+  {name === "play" && <path d="M8 5.5v13l11-6.5z" />}
+  {name === "pause" && <path d="M9 5v14M15 5v14" />}
+  {
+    name === "file" && (
+      <>
+        <path d="M13.5 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5Z" />
+        <path d="M13.5 3v5.5H19" />
+      </>
+    )
+  }
+  {
+    name === "share" && (
+      <>
+        <path d="M12 15V3m0 0L8 7m4-4 4 4" />
+        <path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+      </>
+    )
+  }
+  {name === "star" && <path d="m12 2 2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z" />}
+  {name === "check" && <path d="m5 12.5 4.5 4.5L19 7" />}
+</svg>

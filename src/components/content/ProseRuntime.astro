@@ -1,0 +1,47 @@
+---
+import { strings } from "@/config/strings";
+
+/**
+ * The two things a story body needs that no single card can provide.
+ *
+ * Tables come out of Markdown carrying no classes of their own, so each one
+ * is given a frame to scroll inside: three columns of prose do not fit a
+ * phone, and an overflowing table drags the whole page sideways with it. The
+ * frame is focusable so it can be scrolled from the keyboard, which a bare
+ * overflow container cannot be.
+ *
+ * Images written as plain Markdown get the same click-to-enlarge treatment a
+ * `Figure` has, so a writer who never reaches for a component still gets the
+ * lightbox.
+ */
+---
+
+<meta name="prose-runtime" data-table-label={strings.cards.table} hidden />
+
+<script>
+  const tableLabel =
+    document.querySelector<HTMLElement>('meta[name="prose-runtime"]')?.dataset.tableLabel ?? "Table";
+
+  document.querySelectorAll<HTMLTableElement>(".prose table").forEach((table) => {
+    if (table.closest(".table-scroll")) return;
+
+    const frame = document.createElement("div");
+    frame.className = "table-scroll";
+    frame.tabIndex = 0;
+    frame.setAttribute("role", "region");
+    frame.setAttribute("aria-label", table.caption?.textContent?.trim() || tableLabel);
+
+    table.replaceWith(frame);
+    frame.append(table);
+  });
+
+  document
+    .querySelectorAll<HTMLImageElement>(".prose > p > img, .prose > img")
+    .forEach((image) => {
+      image.dataset.lightbox = "";
+      image.dataset.lightboxGroup = "story";
+      image.dataset.lightboxSrc = image.currentSrc || image.src;
+      image.dataset.lightboxAlt = image.alt;
+      image.style.cursor = "zoom-in";
+    });
+</script>

@@ -1,0 +1,31 @@
+---
+/**
+ * A third-party embed. The iframe is written out by the author rather than
+ * fetched from an oEmbed endpoint, so the theme makes no network calls at
+ * build time and nothing loads that the author did not put there.
+ *
+ * `title` is not decoration: an iframe with no accessible name is announced
+ * as "frame" and nothing else.
+ */
+interface Props {
+  src: string;
+  title: string;
+  caption?: string;
+  /** Video keeps 16:9. Turn it off for an embed that sets its own height. */
+  ratio?: boolean;
+  allow?: string;
+}
+
+const {
+  src,
+  title,
+  caption,
+  ratio = true,
+  allow = "accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+} = Astro.props;
+---
+
+<figure class:list={["card", "card-embed", ratio && "card-embed-ratio"]}>
+  <iframe src={src} title={title} allow={allow} allowfullscreen loading="lazy"></iframe>
+  {caption && <figcaption class="figure-caption">{caption}</figcaption>}
+</figure>

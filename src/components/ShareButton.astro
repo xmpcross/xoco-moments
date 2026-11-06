@@ -1,0 +1,57 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import { strings } from "@/config/strings";
+
+/**
+ * Opens the page's `ShareSheet`. Where the browser has a share sheet of its
+ * own — a phone, mostly — the native one is used instead, because it reaches
+ * apps a web page never can.
+ */
+interface Props {
+  title: string;
+  /** Absolute URL. Defaults to the canonical URL of the page. */
+  url?: string;
+  label?: string;
+  class?: string;
+}
+
+const { title, url, label = strings.story.share, class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  class:list={["btn btn-outline btn-sm", className]}
+  data-share-open
+  data-share-title={title}
+  data-share-url={url}
+>
+  <Icon name="share" size={14} />
+  <span>{label}</span>
+</button>
+
+<script>
+  /* The native sheet is offered first, and only where it exists. `canShare`
+     rather than `share` alone: some desktop browsers expose `share` and then
+     reject every call, which would swallow the click. */
+  document.querySelectorAll<HTMLButtonElement>("[data-share-open]").forEach((button) => {
+    button.addEventListener(
+      "click",
+      async (event) => {
+        const data = {
+          title: button.dataset.shareTitle ?? document.title,
+          url: button.dataset.shareUrl ?? window.location.href,
+        };
+
+        if (!navigator.canShare?.(data)) return;
+
+        event.stopImmediatePropagation();
+        try {
+          await navigator.share(data);
+        } catch {
+          /* Dismissed, or refused. The sheet in the page is still there. */
+        }
+      },
+      { capture: true },
+    );
+  });
+</script>

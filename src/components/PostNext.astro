@@ -1,0 +1,36 @@
+---
+import { Image } from "astro:assets";
+import { strings } from "@/config/strings";
+import { coverSizes } from "@/lib/images";
+import { postHref, type Post } from "@/lib/posts";
+
+/**
+ * The last thing on a story: the next photograph, at full width. It is the
+ * only navigation at the foot of the page, and it is the same size as the one
+ * at the top, which is the point.
+ */
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+---
+
+<a class="post-next" href={postHref(post)}>
+  <div class="post-next-media">
+    <Image
+      src={post.data.cover.src}
+      alt=""
+      widths={[800, 1200, 1600, 2000]}
+      sizes={coverSizes(post.data.cover.src, 70)}
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+  <div class="post-next-scrim"></div>
+
+  <div class="post-next-body">
+    <p class="label">{strings.story.next}</p>
+    <p class="title-xl post-next-title">{post.data.title}</p>
+  </div>
+</a>

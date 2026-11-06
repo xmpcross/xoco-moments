@@ -1,0 +1,18 @@
+---
+import { strings } from "@/config/strings";
+import PageLayout from "@/layouts/PageLayout.astro";
+
+const { notFound } = strings;
+---
+
+<PageLayout title={notFound.title} description={notFound.description} noindex>
+  <section class="wrap error-page">
+    <div>
+      <p class="error-code" aria-hidden="true">404</p>
+      <h1 class="title-xl error-message">{notFound.message}</h1>
+      <p class="error-actions">
+        <a class="btn btn-outline" href="/work/"><span>{notFound.back}</span></a>
+      </p>
+    </div>
+  </section>
+</PageLayout>

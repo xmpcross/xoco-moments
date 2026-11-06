@@ -1,0 +1,203 @@
+---
+import LocalIcon from "@/components/LocalIcon.astro";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { breadcrumbSchema } from "@/lib/schema";
+import { socialIconFor } from "@/lib/socials";
+
+/**
+ * The enquiry page: the studio's own words and the ways to reach it on one
+ * side, the form on the other.
+ *
+ * The form posts to whatever URL is set in `siteConfig.contact.action` — a
+ * Formspree endpoint, a Netlify function, anything that takes a POST.
+ */
+const contact = siteConfig.contact;
+const action = contact.action.trim();
+/* The form is always rendered, so the page can be seen as it will look. With
+   no endpoint the submit is disabled and says why: a form that silently goes
+   nowhere is worse than no form, but one nobody can look at is no use to
+   somebody deciding whether the theme suits them. */
+const canSubmit = contact.enabled && action.length > 0;
+const form = strings.forms.contact;
+
+const schema = breadcrumbSchema([
+  { name: siteConfig.name, href: "/" },
+  { name: strings.home.sayHello, href: "/contact/" },
+]);
+---
+
+<PageLayout title={strings.home.sayHello} description={contact.prompt} structuredData={schema}>
+  <header class="wrap wrap-mid page-head">
+    <h1 class="display page-head-title" data-reveal="up">{strings.home.sayHello}</h1>
+    <p class="lede page-head-lede" data-reveal="up">
+      {contact.prompt} {contact.responseTime}
+    </p>
+  </header>
+
+  <section class="wrap wrap-mid contact-section">
+    <div class="contact-layout">
+      <div class="contact-intro">
+        <div class="prose prose-page">
+          <h2>Write to me</h2>
+          <p><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></p>
+
+          <h2>What to send</h2>
+          <p>
+            The date, where it is happening, and a rough headcount is enough to start. If you have
+            a plan for the day, send that too.
+          </p>
+
+          <h2>Response time</h2>
+          <p>
+            {contact.responseTime} If you have not heard back inside a week, the message did not
+            arrive. Send it again.
+          </p>
+        </div>
+
+        <aside class="contact-aside">
+          <dl class="contact-detail">
+            <dt>{form.based}</dt>
+            {contact.office.map((line) => <dd>{line}</dd>)}
+          </dl>
+
+          <dl class="contact-detail">
+            <dt>{form.follow}</dt>
+            <dd class="contact-socials">
+              {
+                siteConfig.socials.map((social) => (
+                  <a class="icon-btn" href={social.href} rel="me noopener" aria-label={social.label}>
+                    <LocalIcon name={socialIconFor(social.label)} className="h-5 w-5" />
+                  </a>
+                ))
+              }
+            </dd>
+          </dl>
+        </aside>
+      </div>
+
+      <form
+        class="contact-form field-group"
+        action={canSubmit ? action : undefined}
+        method={contact.method}
+      >
+        <div class="field-group field-group-2">
+          <div>
+            <label class="form-label" for="contact-name">{form.names}</label>
+            <input
+              class="field"
+              id="contact-name"
+              type="text"
+              name="name"
+              autocomplete="name"
+              required
+            />
+          </div>
+
+          <div>
+            <label class="form-label" for="contact-email">{form.email}</label>
+            <input
+              class="field"
+              id="contact-email"
+              type="email"
+              name="email"
+              autocomplete="email"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field-group field-group-2">
+          <div>
+            <label class="form-label" for="contact-date">{form.date}</label>
+            <input class="field" id="contact-date" type="date" name="date" />
+          </div>
+
+          <div>
+            <label class="form-label" for="contact-place">{form.place}</label>
+            <input class="field" id="contact-place" type="text" name="place" />
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label" for="contact-message">{form.message}</label>
+          <textarea class="field" id="contact-message" name="message" rows="7" required></textarea>
+        </div>
+
+        <div>
+          <button class="btn btn-accent" type="submit" disabled={!canSubmit}>
+            <span>{form.send}</span>
+          </button>
+          {!canSubmit && <p class="form-note contact-form-note">{form.unset}</p>}
+        </div>
+      </form>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .contact-section {
+    padding-bottom: var(--space-section);
+  }
+
+  .contact-layout {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  /* The words and the form sit side by side once there is room for both to
+     keep a comfortable measure; below that the words come first. */
+  @media (min-width: 64rem) {
+    .contact-layout {
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .contact-intro {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2rem, 4vw, 3rem);
+  }
+
+  .contact-intro .prose {
+    max-width: 34rem;
+  }
+
+  .contact-form {
+    gap: 1.5rem;
+  }
+
+  .contact-form-note {
+    margin-top: 0.75rem;
+  }
+
+  .contact-aside {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 3rem;
+    padding-top: clamp(1.75rem, 3vw, 2.5rem);
+    border-top: var(--rule-thin);
+  }
+
+  .contact-detail dt {
+    margin-bottom: 0.375rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-label);
+    font-size: 0.625rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .contact-detail dd {
+    margin: 0;
+  }
+
+  .contact-socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-left: -0.5rem;
+  }
+</style>

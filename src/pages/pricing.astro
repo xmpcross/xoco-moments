@@ -1,0 +1,212 @@
+---
+import Icon from "@/components/ui/Icon.astro";
+import { pricing } from "@/config/pricing";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { breadcrumbSchema } from "@/lib/schema";
+
+/**
+ * The packages, three across, each ending in the same button to the enquiry
+ * page. The copy lives in `src/config/pricing.ts`; nothing here needs
+ * editing to change a price.
+ */
+const schema = breadcrumbSchema([
+  { name: siteConfig.name, href: "/" },
+  { name: pricing.title, href: "/pricing/" },
+]);
+---
+
+<PageLayout title={pricing.title} description={pricing.lede} structuredData={schema}>
+  <header class="wrap wrap-mid page-head">
+    <h1 class="display page-head-title" data-reveal="up">{pricing.title}</h1>
+    <p class="lede page-head-lede" data-reveal="up">{pricing.lede}</p>
+  </header>
+
+  <section class="wrap pricing-section">
+    <div class="pricing-grid" data-reveal-group="90">
+      {
+        pricing.packages.map((pkg) => (
+          <article
+            class:list={["pricing-card", pkg.featured && "pricing-card-featured"]}
+            data-reveal="up"
+          >
+            {pkg.featured && <p class="pricing-badge">{strings.pricing.mostBooked}</p>}
+
+            <div class="pricing-head">
+              <h2 class="pricing-name">{pkg.name}</h2>
+              <p class="pricing-price">
+                {pkg.priceNote && <span class="pricing-price-note">{pkg.priceNote}</span>}
+                <span>{pkg.price}</span>
+              </p>
+              <p class="pricing-summary">{pkg.summary}</p>
+            </div>
+
+            <div class="pricing-includes">
+              <p class="pricing-includes-title">{strings.pricing.includes}</p>
+              <ul>
+                {pkg.includes.map((line) => (
+                  <li>
+                    <Icon name="check" size={14} />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <a
+              class:list={["btn", pkg.featured ? "btn-accent" : "btn-outline"]}
+              href="/contact/"
+            >
+              <span>{strings.pricing.enquire}</span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+
+    {pricing.note && <p class="pricing-note" data-reveal="up">{pricing.note}</p>}
+  </section>
+</PageLayout>
+
+<style>
+  .pricing-section {
+    padding-bottom: var(--space-section);
+  }
+
+  .pricing-grid {
+    display: grid;
+    gap: clamp(2rem, 6vw, 2.75rem);
+  }
+
+  @media (min-width: 64rem) {
+    .pricing-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+      gap: clamp(1rem, 2vw, 1.5rem);
+    }
+  }
+
+  .pricing-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.75rem, 3vw, 2.25rem);
+    padding: clamp(1.75rem, 3vw, 2.75rem);
+    border: var(--rule-thin);
+    background: var(--surface);
+  }
+
+  .pricing-card-featured {
+    border-color: var(--border-strong);
+    background: var(--background-wash);
+  }
+
+  .pricing-badge {
+    position: absolute;
+    top: 0;
+    left: clamp(1.75rem, 3vw, 2.75rem);
+    margin: 0;
+    padding: 0.4rem 0.75rem;
+    background: var(--foreground);
+    color: var(--background);
+    font-family: var(--font-label);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    transform: translateY(-50%);
+  }
+
+  .pricing-head {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pricing-name {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--font-label);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .pricing-price {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.6rem;
+    align-items: baseline;
+    margin: 0;
+    font-family: var(--font-title);
+    font-size: clamp(2.5rem, 4vw, 3.25rem);
+    font-weight: var(--title-weight);
+    letter-spacing: var(--title-tracking);
+    line-height: 1;
+  }
+
+  .pricing-price-note {
+    order: 1;
+    color: var(--muted-foreground);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+  }
+
+  .pricing-summary {
+    margin: 0;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+
+  .pricing-includes {
+    padding-top: clamp(1.25rem, 2vw, 1.75rem);
+    border-top: var(--rule-thin);
+  }
+
+  .pricing-includes-title {
+    margin: 0 0 1rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-label);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .pricing-includes ul {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pricing-includes li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .pricing-includes svg {
+    flex: none;
+    margin-top: 0.3rem;
+    color: var(--accent-text);
+  }
+
+  .pricing-card .btn {
+    align-self: flex-start;
+    margin-top: auto;
+  }
+
+  .pricing-note {
+    max-width: 44rem;
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+</style>

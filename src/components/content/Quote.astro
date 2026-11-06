@@ -1,0 +1,21 @@
+---
+/**
+ * A pull quote. The standard style opens with a large serif quotation mark in
+ * the accent colour; `alt` drops that and sets real marks either side of the
+ * words instead.
+ *
+ * A quote reads best as the transition into a run of photographs, so put it
+ * directly before a gallery with nothing between the two.
+ */
+interface Props {
+  attribution?: string;
+  variant?: "standard" | "alt";
+}
+
+const { attribution, variant = "standard" } = Astro.props;
+---
+
+<blockquote class:list={["pullquote", variant === "alt" && "pullquote-alt"]}>
+  <slot />
+  {attribution && <cite class="pullquote-attribution">{attribution}</cite>}
+</blockquote>

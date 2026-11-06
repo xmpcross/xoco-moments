@@ -1,0 +1,70 @@
+---
+import { Image } from "astro:assets";
+import { formatDate, postHref, type Post } from "@/lib/posts";
+
+/**
+ * One photograph in a wall of them.
+ *
+ * The title is held inside the frame and only arrives on hover, so a wall at
+ * rest is a wall of pictures and nothing else. Where there is no pointer the
+ * overlay is dropped and the title sits under the photograph instead, so the
+ * words are never the thing a phone cannot reach.
+ */
+interface Props {
+  post: Post;
+  /** The `sizes` attribute for the layout this is rendered in. */
+  sizes?: string;
+  /** Set on the first rows, which are on or just below the fold. */
+  eager?: boolean;
+  /**
+   * Set only on the one or two tiles that are the page's largest paint. The
+   * hint is a ranking, so handing it to a whole row ranks nothing.
+   */
+  priority?: boolean;
+  headingLevel?: "h2" | "h3";
+}
+
+const {
+  post,
+  sizes = "(min-width: 88rem) 30vw, (min-width: 40rem) 46vw, 92vw",
+  eager = false,
+  priority = false,
+  headingLevel: Heading = "h3",
+} = Astro.props;
+
+const href = postHref(post);
+const meta = [post.data.collection, formatDate(post.data.date, "month")];
+---
+
+<article class="tile" data-reveal="image">
+  <a class="tile-link" href={href}>
+    <div class="tile-media">
+      <Image
+        src={post.data.cover.src}
+        alt={post.data.cover.alt}
+        widths={[400, 600, 900, 1200, 1600, 2000]}
+        sizes={sizes}
+        loading={eager ? "eager" : "lazy"}
+        fetchpriority={priority ? "high" : undefined}
+        decoding="async"
+        data-autosize
+      />
+
+      <div class="tile-overlay">
+        <span class="tile-title-mask">
+          <Heading class="tile-title">{post.data.title}</Heading>
+        </span>
+        <div class="tile-meta meta-row">
+          {meta.map((item) => <span>{item}</span>)}
+        </div>
+      </div>
+    </div>
+
+    <div class="tile-caption">
+      <span class="tile-caption-title">{post.data.title}</span>
+      <div class="tile-meta meta-row">
+        {meta.map((item) => <span>{item}</span>)}
+      </div>
+    </div>
+  </a>
+</article>

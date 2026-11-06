@@ -1,0 +1,126 @@
+---
+import Wordmark from "@/components/Wordmark.astro";
+import SiteDrawer from "@/components/SiteDrawer.astro";
+import Icon from "@/components/ui/Icon.astro";
+import { primaryNavigation, siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import { isCurrentPath } from "@/lib/navigation";
+
+/**
+ * The bar carries the wordmark, the menu inline on a wide screen, and two
+ * controls: colour mode, and the burger that opens the drawer everywhere the
+ * menu does not fit.
+ *
+ * Whether it floats over the page is not a property of the bar: it is a
+ * property of what the page underneath it opened with. A page that opens on a
+ * full-bleed photograph passes `over`, and the slot that normally reserves the
+ * bar's height collapses to zero so the picture starts at the top of the
+ * window. Pinning it on a scroll back up puts the solid surface back.
+ */
+interface Props {
+  /** Set on pages that open on a full-bleed photograph. */
+  over?: boolean;
+}
+
+const { over = false } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<div class:list={["site-header-slot", over && "site-header-slot--over"]}>
+  <header class:list={["site-header", over && "site-header--over"]} data-site-header>
+    <div class="wrap site-header-inner">
+      <div class="site-header-brand">
+        <a class="wordmark-link" href="/" aria-label={strings.nav.home(siteConfig.name)}>
+          <Wordmark />
+        </a>
+      </div>
+
+      <nav class="site-header-nav" aria-label={strings.nav.main}>
+        <ul>
+          {
+            primaryNavigation.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={isCurrentPath(path, item.href) ? "page" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="site-header-actions">
+        <button
+          type="button"
+          class="icon-btn"
+          data-theme-toggle
+          aria-label={strings.nav.colourMode}
+        >
+          <Icon name="sun" class="theme-icon-sun" />
+          <Icon name="moon" class="theme-icon-moon" />
+        </button>
+
+        <button
+          type="button"
+          class="menu-toggle"
+          aria-controls="site-drawer"
+          aria-expanded="false"
+          data-drawer-open
+        >
+          <span class="menu-icon-open"><Icon name="menu" /></span>
+          <span class="menu-icon-close"><Icon name="close" /></span>
+          <span class="sr-only">{strings.nav.openMenu}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+</div>
+
+<SiteDrawer />
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-site-header]");
+
+  if (header) {
+    let ticking = false;
+    let lastY = window.scrollY;
+
+    const update = () => {
+      const y = window.scrollY;
+      const past = y > header.offsetHeight;
+
+      /* Back at the top the bar returns to the flow, which is what lets it lie
+         on the opening photograph again rather than staying a solid strip. */
+      if (y <= 8) {
+        header.classList.remove("is-pinned", "is-hidden");
+      } else if (y < lastY && past) {
+        if (!header.classList.contains("is-pinned")) {
+          // Land hidden first, so the bar slides in rather than popping.
+          header.classList.add("is-pinned", "is-hidden");
+          void header.getBoundingClientRect();
+        }
+        header.classList.remove("is-hidden");
+      } else if (y > lastY && past) {
+        header.classList.add("is-hidden");
+      }
+
+      lastY = y;
+      ticking = false;
+    };
+
+    update();
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+  }
+</script>

@@ -1,0 +1,205 @@
+---
+import { Image } from "astro:assets";
+import Icon from "@/components/ui/Icon.astro";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import { coverSizes } from "@/lib/images";
+import { formatDate, postHref, type Post } from "@/lib/posts";
+
+/**
+ * The full-bleed opening.
+ *
+ * Up to three featured stories play as cross-faded slides, with a progress
+ * bar for each that can be clicked through. Every title is a real link in the
+ * markup, so without JavaScript the first slide is simply the hero: nothing
+ * here depends on a script to have content.
+ *
+ * A lazy image that covers the viewport is not lazy at all, even at zero
+ * opacity, so a slide that is neither showing nor next is not displayed at
+ * all. The script stages the next slide one interval ahead, which is when its
+ * photograph starts to load. Slides that are not showing are `inert`, so
+ * their links are neither tab stops nor read out.
+ *
+ * The show never pauses on hover. The hero fills the window, so the pointer
+ * is always over it, and pausing on hover froze it on slide one.
+ */
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+const interval = siteConfig.heroInterval;
+---
+
+{
+  posts.length > 0 && (
+    <section class="home-hero">
+      <div
+        class="home-hero-slides"
+        data-hero
+        data-slides={posts.length}
+        style={`--hero-interval:${interval}s`}
+      >
+        {posts.map((post, index) => (
+          <div
+            class:list={["home-hero-slide", index === 0 && "is-current is-staged"]}
+            inert={index !== 0}
+          >
+            <div class="home-hero-media">
+              <Image
+                src={post.data.cover.src}
+                alt={post.data.cover.alt}
+                widths={[800, 1200, 1600, 2000, 2400]}
+                sizes={coverSizes(post.data.cover.src)}
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchpriority={index === 0 ? "high" : undefined}
+                decoding="async"
+              />
+            </div>
+            <div class="home-hero-scrim" />
+
+            <div class="wrap home-hero-body">
+              {/* No place here: the hero is a poster, and the story's own
+                  opening carries the where. */}
+              <p class="label meta-row home-hero-kicker">
+                <span>{post.data.collection}</span>
+                <span>{formatDate(post.data.date, "month")}</span>
+              </p>
+
+              <h2 class="display home-hero-title">
+                <a href={postHref(post)}>{post.data.title}</a>
+              </h2>
+
+              <p class="lede home-hero-excerpt">{post.data.excerpt}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* The controls sit over the slides rather than inside one, so they stay
+          put while the photographs cross-fade. */}
+      {posts.length > 1 && (
+        <div class="wrap home-hero-controls">
+          <ul class="home-hero-dots">
+            {posts.map((post, index) => (
+              <li>
+                <button
+                  type="button"
+                  class="home-hero-dot"
+                  data-hero-dot
+                  aria-current={index === 0 ? "true" : "false"}
+                  aria-label={strings.hero.showStory(index + 1, post.data.title)}
+                />
+              </li>
+            ))}
+          </ul>
+
+          <button
+            type="button"
+            class="icon-btn home-hero-pause"
+            data-hero-pause
+            aria-pressed="false"
+            aria-label={strings.hero.pause}
+            data-label-pause={strings.hero.pause}
+            data-label-play={strings.hero.play}
+          >
+            <span class="hero-icon-pause">
+              <Icon name="pause" />
+            </span>
+            <span class="hero-icon-play">
+              <Icon name="play" />
+            </span>
+          </button>
+        </div>
+      )}
+    </section>
+  )
+}
+
+<script>
+  const stage = document.querySelector<HTMLElement>("[data-hero]");
+
+  if (stage) {
+    const slides = [...stage.querySelectorAll<HTMLElement>(".home-hero-slide")];
+    const dots = [...document.querySelectorAll<HTMLButtonElement>("[data-hero-dot]")];
+    const pause = document.querySelector<HTMLButtonElement>("[data-hero-pause]");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const interval =
+      (Number.parseFloat(getComputedStyle(stage).getPropertyValue("--hero-interval")) || 6) * 1000;
+
+    if (slides.length > 1) {
+      let current = 0;
+      let paused = reduced.matches;
+      let timer = 0;
+
+      /* Puts a slide into the layout, which is what starts its lazy image
+         loading. A slide staged from a click gets a frame in the layout
+         before it becomes current, or the fade would have nothing to run from. */
+      const prepare = (at: number) => {
+        const slide = slides[(at + slides.length) % slides.length];
+        if (slide.classList.contains("is-staged")) return;
+        slide.classList.add("is-staged");
+        slide.querySelector("img")?.setAttribute("loading", "eager");
+        void slide.offsetWidth;
+      };
+
+      const show = (next: number) => {
+        const previous = current;
+        current = (next + slides.length) % slides.length;
+        prepare(current);
+        slides.forEach((slide, index) => {
+          const active = index === current;
+          slide.classList.toggle("is-current", active);
+          /* The outgoing slide stays in the layout while it fades. */
+          slide.classList.toggle("is-staged", active || index === previous);
+          slide.inert = !active;
+        });
+        dots.forEach((dot, index) =>
+          dot.setAttribute("aria-current", index === current ? "true" : "false"),
+        );
+      };
+
+      const stop = () => window.clearTimeout(timer);
+
+      const schedule = () => {
+        stop();
+        if (paused) return;
+        /* The next slide gets the whole interval to arrive before it fades in. */
+        prepare(current + 1);
+        timer = window.setTimeout(() => {
+          show(current + 1);
+          schedule();
+        }, interval);
+      };
+
+      const setPaused = (value: boolean) => {
+        paused = value;
+        stage.classList.toggle("is-paused", paused);
+        pause?.setAttribute("aria-pressed", String(paused));
+        pause?.setAttribute(
+          "aria-label",
+          (paused ? pause.dataset.labelPlay : pause.dataset.labelPause) ?? "",
+        );
+        schedule();
+      };
+
+      dots.forEach((dot, index) =>
+        dot.addEventListener("click", () => {
+          show(index);
+          schedule();
+        }),
+      );
+
+      pause?.addEventListener("click", () => setPaused(!paused));
+
+      /* Held only while the tab is hidden: a browser throttles timers there,
+         and coming back to a slide mid-fade looks broken. */
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop();
+        else schedule();
+      });
+
+      setPaused(paused);
+    }
+  }
+</script>

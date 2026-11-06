@@ -1,0 +1,70 @@
+---
+import { getCollection } from "astro:content";
+import type { GetStaticPaths, Page } from "astro";
+import PageHeader from "@/components/PageHeader.astro";
+import Pagination from "@/components/Pagination.astro";
+import Wall from "@/components/Wall.astro";
+import { siteConfig } from "@/config/site";
+import { strings } from "@/config/strings";
+import PageLayout from "@/layouts/PageLayout.astro";
+import { usedCollections, visiblePosts, type Post } from "@/lib/posts";
+
+/**
+ * The Work page: every story's opening photograph in one wall, with nothing
+ * but the pictures on it. Each one links to the day it came from, and
+ * clicking is the only way back into the words.
+ */
+export const getStaticPaths = (async ({ paginate }) => {
+  const posts = visiblePosts(await getCollection("posts"));
+
+  return paginate(posts, { pageSize: siteConfig.postsPerPage, props: { posts } });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<Post>;
+  posts: Post[];
+}
+
+const { page, posts } = Astro.props;
+const collections = usedCollections(posts);
+const total = posts.length;
+const { archive } = strings;
+---
+
+<PageLayout
+  title={page.currentPage > 1 ? archive.pageTitle(archive.work, page.currentPage) : archive.work}
+  description={archive.workDescription}
+  prevUrl={page.url.prev}
+  nextUrl={page.url.next}
+>
+  <PageHeader title={archive.work} lede={archive.workLede}>
+    <p slot="aside" class="archive-count">
+      {archive.count(total)}
+      {page.lastPage > 1 && <> · {archive.pageOf(page.currentPage, page.lastPage)}</>}
+    </p>
+
+    <nav class="archive-filters" aria-label={archive.collections}>
+      <span class="pill pill-current" aria-current="page">{archive.everything}</span>
+      {collections.map((entry) => <a class="pill" href={entry.href}>{entry.name}</a>)}
+    </nav>
+  </PageHeader>
+
+  <section class="wrap archive-feed">
+    {
+      page.data.length > 0 ? (
+        <Wall posts={page.data} headingLevel="h2" />
+      ) : (
+        <p class="archive-empty">{archive.emptyWork}</p>
+      )
+    }
+
+    <Pagination
+      prevUrl={page.url.prev}
+      nextUrl={page.url.next}
+      currentPage={page.currentPage}
+      lastPage={page.lastPage}
+      base="/work/"
+      label={strings.pagination.label(archive.work)}
+    />
+  </section>
+</PageLayout>

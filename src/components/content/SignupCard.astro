@@ -1,0 +1,23 @@
+---
+import SubscribeForm from "@/components/SubscribeForm.astro";
+
+/**
+ * The mailing list, mid-story, at the full width of the window. Reads its
+ * provider from `siteConfig.newsletter` like every other signup on the site,
+ * so there is only ever one place to wire it up.
+ */
+interface Props {
+  heading: string;
+  subheading?: string;
+  buttonText?: string;
+  id?: string;
+}
+
+const { heading, subheading, buttonText = "Sign up", id = "signup-card" } = Astro.props;
+---
+
+<aside class="card card-full card-signup">
+  <h2 class="card-signup-heading">{heading}</h2>
+  {subheading && <p class="card-signup-sub">{subheading}</p>}
+  <SubscribeForm id={id} buttonLabel={buttonText} />
+</aside>

@@ -1,0 +1,3461 @@
+@import "tailwindcss";
+@source "../**/*.{astro,ts,md,mdx}";
+
+/* ==========================================================================
+   Moments — the theme's one stylesheet.
+
+   Tokens, then base, then components in the order a page assembles them.
+   Component-specific rules that only one page uses live in that page's own
+   <style> block instead.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant/CormorantGaramond-Variable-latin.woff2") format("woff2-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant/CormorantGaramond-Variable-latin-ext.woff2") format("woff2-variations");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("/fonts/cormorant/CormorantGaramond-Variable-italic-latin.woff2")
+    format("woff2-variations");
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Marcellus";
+  src: url("/fonts/marcellus/Marcellus-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Marcellus";
+  src: url("/fonts/marcellus/Marcellus-latin-ext.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter/Inter-Variable-latin.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter/Inter-Variable-latin-ext.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter/Inter-Variable-italic-latin.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --background: oklch(0.982 0 0);
+  --background-wash: oklch(0.955 0 0);
+  --surface: oklch(0.982 0 0);
+  --foreground: oklch(0.19 0 0);
+  --muted: oklch(0.93 0 0);
+  --muted-foreground: oklch(0.51 0 0);
+  --ink-soft: oklch(0.36 0 0);
+
+  /* The mark the theme is set in. Monochrome by default: the ink on a light
+     page, its inverse on a dark one, so the only colour on the page is in
+     the photographs. Set a real colour here and everything below follows. */
+  --brand: oklch(0.19 0 0);
+  --accent: var(--brand);
+  --accent-foreground: oklch(1 0 0);
+  /* `--accent` paints fills; `--accent-text` is what every `color:` rule
+     takes, because a pale brand colour is unreadable as text. */
+  --accent-text: var(--accent);
+  --accent-on-dark: color-mix(in oklab, var(--accent) 70%, white);
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--background));
+
+  /* Panels that stay dark whatever the colour mode */
+  --inverted: oklch(0.155 0 0);
+  --inverted-foreground: oklch(0.95 0 0);
+
+  --masthead: var(--background);
+  --masthead-foreground: var(--foreground);
+  --footer: var(--background-wash);
+
+  --border: oklch(0.86 0 0);
+  --border-strong: oklch(0.19 0 0);
+  --rule-thin: 1px solid var(--border);
+  --rule-strong: 1px solid var(--border-strong);
+
+  --radius: 2px;
+  --radius-control: 999px;
+
+  /* Cormorant Garamond ships alongside and is a drop-in alternative: name it
+     here instead and swap the preload in BaseLayout. It sets lighter and
+     smaller, so the steps below want a nudge up if you switch. */
+  --font-display: "Marcellus", "Hoefler Text", "Iowan Old Style", Palatino, Georgia, serif;
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;
+  --font-label: var(--font-sans);
+  --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --font-title: var(--font-display);
+  --title-weight: 400;
+  --title-tracking: -0.015em;
+
+  --layout-wide: 104rem;
+  --layout-reading: 38rem;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --space-section: clamp(4.5rem, 9vw, 10rem);
+
+  --header-height: 4.5rem;
+  --header-height-pinned: 3.5rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-image: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* What a filled button swaps to on hover. With a monochrome accent the
+     resting fill is already the page's ink, so the hover steps to the softer
+     ink rather than to the ink itself, which would be no change at all. */
+  --btn-hover-fill: var(--ink-soft);
+  --btn-hover-label: var(--background);
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --header-height: 5.5rem;
+    --header-height-pinned: 4rem;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --background: oklch(0.145 0 0);
+  --background-wash: oklch(0.185 0 0);
+  --surface: oklch(0.145 0 0);
+  --foreground: oklch(0.95 0 0);
+  --muted: oklch(0.24 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  --ink-soft: oklch(0.82 0 0);
+
+  /* The inverse of the light mark, so a monochrome theme is white on black
+     here without a second setting to keep in step. */
+  --brand: oklch(0.97 0 0);
+  --accent: var(--brand);
+  --accent-foreground: oklch(0.14 0 0);
+  --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--background));
+
+  --inverted: oklch(0.11 0 0);
+  --inverted-foreground: oklch(0.96 0 0);
+
+  --border: oklch(1 0 0 / 15%);
+  --border-strong: oklch(0.8 0 0);
+
+  --btn-hover-fill: var(--ink-soft);
+}
+
+/* The accent can be set to anything, so its label has to be derived rather
+   than declared. `clamp` turns the lightness comparison into 1 (white) or 0
+   (black), which is what saves a second setting. */
+@supports (color: oklch(from white l c h)) {
+  :root {
+    --accent-foreground: oklch(from var(--accent) clamp(0, (0.58 - l) * 1000, 1) 0 0);
+    /* Raising the lightness, not mixing with white: a black accent mixed
+       with white is grey, and loses the hue. */
+    --accent-on-dark: oklch(from var(--accent) max(l, 0.9) c h);
+    /* The same failure inverted: cap a pale accent used as text. */
+    --accent-text: oklch(from var(--accent) min(l, 0.54) c h);
+  }
+
+  :root[data-theme="dark"] {
+    --accent: oklch(from var(--brand) max(l, 0.74) c h);
+    --accent-text: oklch(from var(--accent) max(l, 0.74) c h);
+  }
+}
+
+/* Subtrees that stay dark whatever the colour mode. Redefining the accent
+   here means every rule inside picks up the lifted value without having to
+   know it is on a dark surface. */
+.site-header--over,
+.home-hero,
+.home-studio,
+.tile-overlay,
+.post-hero,
+.post-next,
+.site-footer--inverted,
+.card-header {
+  --accent: var(--accent-on-dark);
+  --accent-text: var(--accent-on-dark);
+  --accent-foreground: oklch(0.14 0 0);
+  --btn-hover-fill: var(--inverted-foreground);
+  --btn-hover-label: var(--inverted);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+  /* Full-width cards are 100vw, which includes the scrollbar, so the page
+     would otherwise gain a sliver of horizontal scroll. `clip`, not `hidden`:
+     hidden turns the root into a scroll container and breaks sticky. */
+  overflow-x: clip;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.1;
+}
+
+p,
+ul,
+ol,
+li,
+dl,
+dd,
+hr,
+pre,
+form,
+table,
+figure,
+figcaption,
+blockquote {
+  margin: 0;
+  padding: 0;
+}
+
+ul[class],
+ol[class] {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+  appearance: none;
+}
+
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+hr {
+  display: block;
+  width: 100%;
+  height: 0;
+  border: 0;
+  border-top: var(--rule-thin);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+mark {
+  background: var(--accent-soft);
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  text-shadow: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 600;
+  transform: translateY(-150%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+.display {
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  font-size: clamp(2.75rem, 8vw, 7.5rem);
+  letter-spacing: var(--title-tracking);
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+.title-xl {
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.title-lg {
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  font-size: clamp(1.75rem, 3.4vw, 2.75rem);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.title-md {
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  font-size: clamp(1.35rem, 2.1vw, 1.85rem);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.12;
+}
+
+/* Kickers, meta rows, form labels, navigation and every control. */
+.label {
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.label-soft {
+  color: var(--muted-foreground);
+}
+
+/* The dot is a pseudo-element, so a row holding one item never trails one. */
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.5rem;
+}
+
+.meta-row > *:not(:last-child)::after {
+  margin-left: 0.5rem;
+  content: "\00b7";
+}
+
+.lede {
+  max-width: 34rem;
+  color: var(--ink-soft);
+  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.caption {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.caption a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* The link treatment outside the story body. */
+.link {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px;
+}
+
+.link::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: currentcolor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease);
+  content: "";
+}
+
+.link:hover::after,
+.link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ==========================================================================
+   Page frame
+   ========================================================================== */
+
+.viewport {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1 0 auto;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--layout-wide);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.wrap-reading {
+  max-width: calc(var(--layout-reading) + var(--gutter) * 2);
+}
+
+.wrap-mid {
+  max-width: 76rem;
+}
+
+.section {
+  padding-block: var(--space-section);
+}
+
+.section-tight {
+  padding-block: calc(var(--space-section) * 0.55);
+}
+
+.section-wash {
+  background: var(--background-wash);
+}
+
+.section-inverted {
+  background: var(--inverted);
+  color: var(--inverted-foreground);
+}
+
+/* Media boxes ------------------------------------------------------------- */
+
+/* A box with a known ratio, the image cropped to fill it: that is what
+   stops a wall of mixed frames reflowing as it loads. */
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--muted);
+}
+
+.media img,
+.media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-portrait {
+  aspect-ratio: 4 / 5;
+}
+.media-tall {
+  aspect-ratio: 2 / 3;
+}
+.media-square {
+  aspect-ratio: 1 / 1;
+}
+.media-landscape {
+  aspect-ratio: 3 / 2;
+}
+.media-wide {
+  aspect-ratio: 16 / 9;
+}
+.media-panorama {
+  aspect-ratio: 3 / 2;
+}
+
+@media (min-width: 48rem) {
+  .media-panorama {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+/* Reveal on scroll -------------------------------------------------------- */
+
+/* Cleared by the observer in BaseLayout as each element crosses into view.
+
+   Every rule sits behind the `js` class the layout adds inline before
+   anything paints, so a visitor whose JavaScript never arrives gets the page
+   in full: an animation must never be the thing that makes content appear. */
+.js [data-reveal] {
+  --reveal-delay: 0ms;
+}
+
+/* The mask goes on the children, never on the observed element: Chrome counts
+   a clip-path when it works out whether something is on screen, so an element
+   clipped to zero height never reports as intersecting and waits for a reveal
+   that can never fire. */
+.js [data-reveal="image"] > * {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.7s var(--ease-image) var(--reveal-delay);
+}
+
+.js [data-reveal="image"] img {
+  transform: scale(1.08);
+  transition: transform 0.9s var(--ease-image) var(--reveal-delay);
+}
+
+.js [data-reveal="up"] {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 0.7s var(--ease) var(--reveal-delay),
+    transform 0.7s var(--ease) var(--reveal-delay);
+}
+
+.js [data-reveal="fade"] {
+  opacity: 0;
+  transition: opacity 1.1s var(--ease) var(--reveal-delay);
+}
+
+.js [data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+.js [data-reveal="image"].is-revealed > * {
+  clip-path: inset(0 0 0 0);
+}
+
+.js [data-reveal="image"].is-revealed img {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal],
+  .js [data-reveal] > *,
+  .js [data-reveal] img {
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Scroll locks ------------------------------------------------------------ */
+
+.has-open-menu,
+.has-open-lightbox,
+.has-open-share {
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Buttons and pills
+   ========================================================================== */
+
+/* The minimum height is what makes a control with an icon and one with bare
+   text the same size side by side. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.875rem 1.875rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    background-color 0.4s var(--ease),
+    border-color 0.4s var(--ease),
+    color 0.4s var(--ease);
+}
+
+.btn svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.btn-accent:hover {
+  background: var(--btn-hover-fill);
+  color: var(--btn-hover-label);
+}
+
+/* The fallback is the ink itself, for browsers without color-mix. */
+.btn-outline {
+  background: transparent;
+  border-color: currentcolor;
+  border-color: color-mix(in oklab, currentcolor 50%, transparent);
+  color: inherit;
+}
+
+.btn-outline:hover {
+  border-color: currentcolor;
+  background: currentcolor;
+  color: var(--foreground);
+}
+
+/* Filling a button with currentcolor leaves the label the same colour as the
+   fill, so the label is repainted to the surface behind the button. */
+.btn-outline:hover > * {
+  color: var(--background);
+}
+
+.section-inverted .btn-outline:hover,
+.site-footer--inverted .btn-outline:hover,
+.home-studio .btn-outline:hover,
+.card-header .btn-outline:hover {
+  color: var(--inverted-foreground);
+}
+
+.section-inverted .btn-outline:hover > *,
+.site-footer--inverted .btn-outline:hover > *,
+.home-studio .btn-outline:hover > *,
+.card-header .btn-outline:hover > * {
+  color: var(--inverted);
+}
+
+.btn-sm {
+  min-height: 2.5rem;
+  padding: 0.5rem 1.375rem;
+  font-size: 0.625rem;
+}
+
+.btn[disabled] {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid currentcolor;
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.arrow-link svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  transition: transform 0.45s var(--ease);
+}
+
+.arrow-link:hover svg {
+  transform: translateX(0.375rem);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.5rem 1.375rem;
+  border: 1px solid currentcolor;
+  border-color: color-mix(in oklab, currentcolor 50%, transparent);
+  border-radius: var(--radius-control);
+  color: inherit;
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    background-color 0.4s var(--ease),
+    border-color 0.4s var(--ease),
+    color 0.4s var(--ease);
+}
+
+/* The label is a bare text node here, so the outline-button hover trick would
+   paint the words into the fill. The same result, written out. */
+.pill:hover {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.pill-current {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.icon-btn {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: inherit;
+  transition:
+    opacity 0.3s var(--ease),
+    background-color 0.3s var(--ease);
+}
+
+.icon-btn svg {
+  width: 1.0625rem;
+  height: 1.0625rem;
+}
+
+.icon-btn:hover {
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+label,
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* A rule under the text says "write here"; the wash behind it says how far
+   the field runs. Both are needed — a bare rule on a page of photographs
+   reads as a divider. */
+.field {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 0;
+  border-bottom: 1px solid color-mix(in oklab, currentcolor 28%, transparent);
+  border-radius: 0;
+  background: color-mix(in oklab, currentcolor 4%, transparent);
+  color: inherit;
+  font-size: 0.9375rem;
+  outline: none;
+  transition:
+    border-color 0.3s var(--ease),
+    background-color 0.3s var(--ease);
+}
+
+.field:hover {
+  background: color-mix(in oklab, currentcolor 6%, transparent);
+}
+
+.field:focus {
+  background: color-mix(in oklab, currentcolor 7%, transparent);
+}
+
+.field::placeholder {
+  color: inherit;
+  opacity: 0.45;
+}
+
+.field:focus {
+  border-bottom-color: currentcolor;
+}
+
+textarea.field {
+  min-height: 11rem;
+  resize: vertical;
+}
+
+.field-group {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  .field-group-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.subscribe-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 40rem) {
+  .subscribe-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.subscribe-form .field,
+.subscribe-form .btn {
+  min-height: 3rem;
+}
+
+.subscribe-form .form-note {
+  grid-column: 1 / -1;
+}
+
+.form-note {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+/* The slot reserves the bar's height, so pinning it on a scroll up never
+   shifts the page. An overlay page collapses the slot instead. */
+.site-header-slot {
+  position: relative;
+  z-index: 40;
+  height: var(--header-height);
+}
+
+.site-header-slot--over {
+  height: 0;
+}
+
+.site-header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: var(--masthead);
+  color: var(--masthead-foreground);
+  transition:
+    transform 0.5s var(--ease),
+    background-color 0.4s var(--ease),
+    color 0.4s var(--ease);
+}
+
+.site-header--over:not(.is-pinned) {
+  background: transparent;
+  color: oklch(0.99 0 0);
+}
+
+.site-header.is-pinned {
+  position: fixed;
+  background: var(--masthead);
+  color: var(--masthead-foreground);
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.site-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  height: var(--header-height);
+  transition: height 0.4s var(--ease);
+}
+
+.site-header.is-pinned .site-header-inner {
+  height: var(--header-height-pinned);
+}
+
+.site-header-brand {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-width: 0;
+}
+
+/* The mark is sized by height and takes whatever width it needs, so
+   replacing `src/assets/logo.svg` with a different shape needs no CSS. */
+.wordmark {
+  display: block;
+  height: var(--wordmark-height, clamp(1.85rem, 3vw, 2.5rem));
+  color: inherit;
+}
+
+.wordmark svg {
+  display: block;
+  width: auto;
+  height: 100%;
+  fill: currentcolor;
+}
+
+.wordmark-lg {
+  --wordmark-height: clamp(2.25rem, 4vw, 3.25rem);
+}
+
+.wordmark-link {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+}
+
+.site-header-nav {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .site-header-nav {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .site-header-nav ul {
+    display: flex;
+    gap: clamp(1.25rem, 2.5vw, 2.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-header-nav a {
+    position: relative;
+    display: block;
+    padding-block: 0.5rem;
+    font-family: var(--font-label);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .site-header-nav a::after {
+    position: absolute;
+    right: 0;
+    bottom: 0.25rem;
+    left: 0;
+    height: 1px;
+    background: currentcolor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.45s var(--ease);
+    content: "";
+  }
+
+  .site-header-nav a:hover::after,
+  .site-header-nav a[aria-current="page"]::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+.site-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+:root[data-theme="dark"] .theme-icon-moon,
+:root:not([data-theme="dark"]) .theme-icon-sun {
+  display: none;
+}
+
+.menu-toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: inherit;
+}
+
+.menu-toggle svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+@media (min-width: 64rem) {
+  .menu-toggle {
+    display: none;
+  }
+}
+
+.menu-icon-close,
+.has-open-menu .menu-icon-open {
+  display: none;
+}
+
+.has-open-menu .menu-icon-close {
+  display: block;
+}
+
+/* Drawer ------------------------------------------------------------------ */
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: oklch(0.1 0 0 / 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease);
+}
+
+.has-open-menu .menu-backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, 88vw);
+  padding: 1.25rem var(--gutter) 2.5rem;
+  overflow-y: auto;
+  background: var(--background);
+  color: var(--foreground);
+  transform: translateX(100%);
+  transition: transform 0.6s var(--ease);
+}
+
+.has-open-menu .menu-panel {
+  transform: none;
+}
+
+.menu-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  margin-bottom: 1.5rem;
+}
+
+.menu-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.menu-group {
+  margin: 0 0 0.75rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.menu-list {
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-list-primary a {
+  display: block;
+  padding: 0.4rem 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.2;
+  transition:
+    color 0.3s var(--ease),
+    transform 0.5s var(--ease);
+}
+
+.menu-list-primary a:hover {
+  color: var(--accent-text);
+  transform: translateX(0.5rem);
+}
+
+.menu-list-secondary a {
+  display: block;
+  padding: 0.3rem 0;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+.menu-list-secondary a:hover {
+  color: var(--foreground);
+}
+
+.menu-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: auto;
+  margin-left: -0.5rem;
+  padding-top: 2.5rem;
+}
+
+/* Socials and the theme toggle are forced to one icon size, or the row is
+   ragged: the toggle is a UI icon and the socials are brand marks. */
+.menu-foot .icon-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.menu-foot .icon-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer {
+  background: var(--footer);
+  color: var(--foreground);
+}
+
+.site-footer--plain {
+  background: var(--background);
+}
+
+.site-footer--inverted {
+  background: var(--inverted);
+  color: var(--inverted-foreground);
+}
+
+.site-footer-signup {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: end;
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+  border-bottom: 1px solid currentcolor;
+}
+
+@media (min-width: 64rem) {
+  .site-footer-signup {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+  }
+}
+
+.site-footer-signup-title {
+  max-width: 14ch;
+}
+
+/* `.lede` carries the page's soft ink, which on the inverted footer is a
+   dark grey on near-black. Inside a panel that is dark in both modes it has
+   to take the panel's own ink instead. */
+.site-footer--inverted .lede,
+.section-inverted .lede {
+  color: inherit;
+  opacity: 0.72;
+}
+
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2.5rem, 5vw, 4rem);
+  align-items: start;
+  padding-block: clamp(3rem, 6vw, 5rem);
+}
+
+.site-footer-brand {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 48rem) {
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 0.8fr));
+  }
+
+  .site-footer-brand {
+    grid-column: auto;
+  }
+}
+
+.site-footer-description {
+  max-width: 30ch;
+  margin-top: 1.25rem;
+  opacity: 0.68;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.site-footer-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 1.75rem;
+  margin-left: -0.5rem;
+}
+
+.site-footer-socials .icon-btn {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.site-footer-socials .icon-btn svg {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.site-footer-heading {
+  margin-bottom: 1.25rem;
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.site-footer-nav ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer-nav a {
+  display: inline-block;
+  font-size: 0.9375rem;
+  opacity: 0.82;
+  transition:
+    opacity 0.3s var(--ease),
+    transform 0.4s var(--ease);
+}
+
+.site-footer-nav a:hover {
+  opacity: 1;
+  transform: translateX(0.25rem);
+}
+
+.site-footer-bottom {
+  border-top: 1px solid currentcolor;
+}
+
+.site-footer-bottom-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1.75rem;
+}
+
+.site-footer-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+}
+
+.site-footer-bottom p {
+  margin: 0;
+  opacity: 0.55;
+  font-size: 0.75rem;
+}
+
+.site-footer-bottom a:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* currentcolor at full strength makes a hard line on a near-black footer. */
+.site-footer-signup,
+.site-footer-bottom {
+  border-color: color-mix(in oklab, currentcolor 14%, transparent);
+}
+
+/* ==========================================================================
+   The wall
+   ========================================================================== */
+
+/* Without JavaScript this is a plain equal-column grid, each tile cropped to
+   the ratio the nth-child pattern below gives it. `Wall.astro` reads those
+   ratios before it moves anything, so the pattern lives in one place and
+   still applies when the script does not run. */
+
+.grid {
+  --grid-cols: 1;
+  --grid-gap: clamp(0.75rem, 1.6vw, 1.75rem);
+
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  gap: var(--grid-gap);
+  align-items: start;
+}
+
+@media (min-width: 40rem) {
+  .grid {
+    --grid-cols: 2;
+  }
+}
+
+@media (min-width: 64rem) {
+  .grid-2 {
+    --grid-cols: 2;
+  }
+  .grid-3 {
+    --grid-cols: 3;
+  }
+  .grid-4 {
+    --grid-cols: 3;
+  }
+}
+
+@media (min-width: 88rem) {
+  .grid-4 {
+    --grid-cols: 4;
+  }
+}
+
+/* The last tile in each column takes up any slack the arithmetic leaves, so
+   the wall always ends on a single line. */
+.grid.is-columned {
+  display: flex;
+  align-items: stretch;
+  gap: var(--grid-gap);
+}
+
+.grid-column {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--grid-gap);
+  min-width: 0;
+}
+
+.grid-column > .tile:last-child,
+.grid-column > .tile:last-child .tile-link {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.grid-column > .tile:last-child .tile-media {
+  flex: 1 1 auto;
+}
+
+/* A cycle of seven, so no two neighbours in a three or four column layout
+   share a shape. */
+.tile-media {
+  --tile-ratio: 4 / 5;
+}
+
+.grid-masonry .tile:nth-child(7n + 2) .tile-media {
+  --tile-ratio: 1 / 1;
+}
+.grid-masonry .tile:nth-child(7n + 3) .tile-media {
+  --tile-ratio: 3 / 4;
+}
+.grid-masonry .tile:nth-child(7n + 4) .tile-media {
+  --tile-ratio: 3 / 2;
+}
+.grid-masonry .tile:nth-child(7n + 6) .tile-media {
+  --tile-ratio: 2 / 3;
+}
+.grid-masonry .tile:nth-child(7n) .tile-media {
+  --tile-ratio: 3 / 2;
+}
+
+/* Tiles ------------------------------------------------------------------- */
+
+.tile {
+  position: relative;
+  min-width: 0;
+}
+
+.tile-link {
+  display: block;
+  color: inherit;
+}
+
+.tile-media {
+  position: relative;
+  aspect-ratio: var(--tile-ratio);
+  overflow: hidden;
+  background: var(--muted);
+}
+
+/* Absolute rather than height: 100%, which a flex-stretched last tile
+   cannot resolve and leaves a strip of placeholder under the photograph. */
+.tile-media img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.3s var(--ease-image);
+}
+
+.tile-link:hover .tile-media img,
+.tile-link:focus-visible .tile-media img {
+  transform: scale(1.06);
+}
+
+/* Weighted to the bottom: a flat tint would grey out the whole photograph. */
+.tile-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1rem, 2vw, 1.75rem);
+  background: linear-gradient(
+    to top,
+    oklch(0.1 0 0 / 78%) 0%,
+    oklch(0.1 0 0 / 42%) 38%,
+    oklch(0.1 0 0 / 0%) 78%
+  );
+  color: oklch(0.99 0 0);
+  opacity: 0;
+  transition: opacity 0.55s var(--ease);
+}
+
+.tile-link:hover .tile-overlay,
+.tile-link:focus-visible .tile-overlay {
+  opacity: 1;
+}
+
+/* The mask is the parent's overflow, so the title clips up out of its own
+   line rather than fading in place. */
+.tile-title-mask {
+  display: block;
+  overflow: hidden;
+}
+
+.tile-title {
+  display: block;
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.15;
+  transform: translateY(105%);
+  transition: transform 0.6s var(--ease) 0.04s;
+}
+
+.tile-meta {
+  margin-top: 0.5rem;
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition:
+    opacity 0.5s var(--ease) 0.12s,
+    transform 0.5s var(--ease) 0.12s;
+}
+
+.tile-link:hover .tile-title,
+.tile-link:focus-visible .tile-title {
+  transform: translateY(0);
+}
+
+.tile-link:hover .tile-meta,
+.tile-link:focus-visible .tile-meta {
+  opacity: 0.82;
+  transform: none;
+}
+
+/* Where there is no pointer there is no hover, so the overlay is dropped and
+   the title sits under the photograph instead. */
+.tile-caption {
+  display: none;
+  margin-top: 0.875rem;
+}
+
+.tile-caption-title {
+  font-family: var(--font-title);
+  font-weight: var(--title-weight);
+  font-size: 1.25rem;
+  letter-spacing: var(--title-tracking);
+  line-height: 1.2;
+}
+
+.tile-caption .tile-meta {
+  margin-top: 0.375rem;
+  opacity: 0.72;
+  transform: none;
+}
+
+@media (hover: none) {
+  .tile-overlay {
+    display: none;
+  }
+
+  /* The grid gap alone leaves the words sitting on the next photograph. */
+  .tile-caption {
+    display: block;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Featured stories lead the hero on the front page, so this mark only
+   actually shows up on the archives. */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: clamp(0.75rem, 1.6vw, 1.75rem);
+}
+
+.strip .tile-media {
+  --tile-ratio: 2 / 3;
+}
+
+/* ==========================================================================
+   Front page
+   ========================================================================== */
+
+/* `svh` rather than `vh`: on a phone, `vh` measures the window with the
+   browser chrome hidden, so the first thing a visitor sees is the bottom of
+   the picture cut off by a toolbar that has not retracted yet. */
+.home-hero {
+  position: relative;
+  height: 100svh;
+  min-height: 34rem;
+  overflow: hidden;
+  background: var(--inverted);
+  color: oklch(0.99 0 0);
+}
+
+.home-hero-slides {
+  position: absolute;
+  inset: 0;
+}
+
+.home-hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s var(--ease);
+}
+
+/* Out of the layout entirely until staged, so its lazy image does not load. */
+.home-hero-slide:not(.is-staged) {
+  display: none;
+}
+
+.home-hero-slide.is-current {
+  opacity: 1;
+}
+
+/* A single featured story never animates: there is nothing to cross-fade to. */
+.home-hero-slides[data-slides="1"] .home-hero-slide {
+  opacity: 1;
+}
+
+.home-hero-media {
+  position: absolute;
+  inset: 0;
+}
+
+.home-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The image is oversized by the same amount it travels, so the frame never
+   runs out of photograph. */
+.home-hero-slide.is-current .home-hero-media img {
+  animation: hero-drift 18s ease-out forwards;
+}
+
+@keyframes hero-drift {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.home-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    oklch(0.08 0 0 / 88%) 0%,
+    oklch(0.08 0 0 / 55%) 32%,
+    oklch(0.08 0 0 / 12%) 62%,
+    oklch(0.08 0 0 / 34%) 100%
+  );
+}
+
+.home-hero-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: clamp(7.5rem, 17vh, 11rem);
+}
+
+.home-hero-kicker {
+  margin-bottom: 1.25rem;
+  opacity: 0.82;
+}
+
+.home-hero-title {
+  max-width: 18ch;
+}
+
+.home-hero-title a {
+  display: inline-block;
+}
+
+.home-hero-excerpt {
+  max-width: 38ch;
+  margin-top: 1.5rem;
+  color: oklch(0.99 0 0 / 82%);
+}
+
+.home-hero-controls {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: clamp(3.5rem, 7vh, 6rem);
+  pointer-events: none;
+}
+
+.home-hero-controls > * {
+  pointer-events: auto;
+}
+
+.home-hero-dots {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-hero-dot {
+  position: relative;
+  width: clamp(2.5rem, 6vw, 4.5rem);
+  height: 2px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: oklch(1 0 0 / 30%);
+}
+
+.home-hero-dot::after {
+  position: absolute;
+  inset: 0;
+  background: oklch(1 0 0);
+  transform: scaleX(0);
+  transform-origin: left;
+  content: "";
+}
+
+.home-hero-dot[aria-current="true"]::after {
+  animation: hero-progress var(--hero-interval, 6s) linear forwards;
+}
+
+@keyframes hero-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Paused: hold the bar rather than snapping it back. */
+.home-hero-slides.is-paused .home-hero-dot::after {
+  animation-play-state: paused;
+}
+
+.home-hero-pause {
+  color: oklch(1 0 0);
+  background: oklch(0 0 0 / 28%);
+  backdrop-filter: blur(8px);
+}
+
+.home-hero-pause:hover {
+  background: oklch(0 0 0 / 50%);
+  opacity: 1;
+}
+
+.hero-icon-pause,
+.hero-icon-play {
+  display: grid;
+  place-items: center;
+}
+
+.home-hero-pause[aria-pressed="true"] .hero-icon-pause,
+.home-hero-pause[aria-pressed="false"] .hero-icon-play {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-dot[aria-current="true"]::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .home-hero-slide.is-current .home-hero-media img {
+    animation: none;
+  }
+}
+
+/* The quieter opening: words on the page, one photograph beside them. */
+.home-hero-split {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  padding-top: clamp(3rem, 8vh, 6rem);
+  padding-bottom: var(--space-section);
+}
+
+@media (min-width: 64rem) {
+  .home-hero-split {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  }
+}
+
+.home-hero-split .media {
+  aspect-ratio: 4 / 5;
+}
+
+.home-hero-split-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.home-work {
+  padding-top: clamp(1rem, 2.5vw, 2.5rem);
+}
+
+.home-grid-foot {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.home-collection {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+@media (min-width: 72rem) {
+  .home-collection {
+    grid-template-columns: 17rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.home-collection-intro {
+  position: sticky;
+  top: calc(var(--header-height) + 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.home-studio {
+  position: relative;
+  background: var(--inverted);
+  color: var(--inverted-foreground);
+}
+
+.home-studio-inner {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: center;
+  padding-block: var(--space-section);
+}
+
+@media (min-width: 64rem) {
+  .home-studio-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.home-studio-media {
+  aspect-ratio: 4 / 3;
+  background: var(--inverted);
+}
+
+.home-studio-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: flex-start;
+  max-width: 34rem;
+}
+
+.home-studio-text {
+  color: oklch(0.99 0 0 / 74%);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.75;
+}
+
+.home-studio-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  margin-top: 1rem;
+}
+
+.home-studio-figure dt {
+  color: oklch(0.99 0 0 / 55%);
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.home-studio-figure dd {
+  margin: 0.375rem 0 0;
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: var(--title-weight);
+  line-height: 1;
+}
+
+.home-call-section {
+  padding-bottom: calc(var(--space-section) * 0.55);
+}
+
+.home-call {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  padding: clamp(3rem, 6vw, 5.5rem) var(--gutter);
+  background: var(--background-wash);
+  text-align: center;
+}
+
+.home-call-title {
+  max-width: 16ch;
+}
+
+/* Marquee ----------------------------------------------------------------- */
+
+/* The track holds the same band repeated and travels exactly one band, so
+   the loop has no seam. The repeats are hidden from assistive technology but
+   stay clickable: on a short band they are the half the reader sees. */
+.marquee {
+  display: flex;
+  overflow: hidden;
+  padding-block: clamp(2rem, 4vw, 3.5rem);
+  border-block: var(--rule-thin);
+  user-select: none;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  flex: none;
+  animation: marquee var(--marquee-duration, 42s) linear infinite;
+  will-change: transform;
+}
+
+.marquee-band {
+  display: flex;
+  flex: none;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(var(--marquee-shift, -50%));
+  }
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  padding-inline: clamp(0.75rem, 1.5vw, 1.5rem);
+  font-family: var(--font-title);
+  font-size: clamp(1.75rem, 4.5vw, 3.5rem);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.1;
+  white-space: nowrap;
+  transition: color 0.35s var(--ease);
+}
+
+.marquee-item:hover {
+  color: var(--accent-text);
+}
+
+.marquee-item::after {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  opacity: 0.45;
+  content: "";
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+
+  .marquee-track,
+  .marquee-band {
+    flex-wrap: wrap;
+  }
+
+  .marquee-track {
+    animation: none;
+  }
+
+  /* The seamless loop needs the repeats; a static band does not. */
+  .marquee-band ~ .marquee-band {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Archives
+   ========================================================================== */
+
+.archive-head {
+  padding-top: clamp(4rem, 12vh, 9rem);
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.archive-head-inner {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: end;
+}
+
+@media (min-width: 64rem) {
+  .archive-head-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  }
+}
+
+.archive-title {
+  max-width: 14ch;
+}
+
+.archive-count {
+  margin-top: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+.archive-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.archive-feed {
+  padding-bottom: var(--space-section);
+}
+
+.archive-empty {
+  padding-block: clamp(4rem, 10vw, 8rem);
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+/* Pagination -------------------------------------------------------------- */
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  padding-top: 2rem;
+  border-top: var(--rule-thin);
+}
+
+.pagination-side {
+  min-width: 6rem;
+}
+
+.pagination-side:last-child {
+  text-align: right;
+}
+
+.pagination-pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pagination-page,
+.pagination-current,
+.pagination-gap {
+  display: grid;
+  place-items: center;
+  min-width: 2.5rem;
+  height: 2.5rem;
+  padding-inline: 0.75rem;
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+}
+
+.pagination-page {
+  border: var(--rule-thin);
+  border-radius: var(--radius-control);
+  transition:
+    background-color 0.3s var(--ease),
+    border-color 0.3s var(--ease),
+    color 0.3s var(--ease);
+}
+
+.pagination-page:hover {
+  border-color: var(--foreground);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.pagination-current {
+  border-radius: var(--radius-control);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.pagination-gap {
+  color: var(--muted-foreground);
+}
+
+/* ==========================================================================
+   Story
+   ========================================================================== */
+
+.post-hero {
+  position: relative;
+  height: min(92svh, 62rem);
+  min-height: 26rem;
+  overflow: hidden;
+  background: var(--inverted);
+  color: oklch(0.99 0 0);
+}
+
+.post-hero-media {
+  position: absolute;
+  inset: 0;
+}
+
+.post-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.post-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    oklch(0.1 0 0 / 74%) 0%,
+    oklch(0.1 0 0 / 22%) 48%,
+    oklch(0.1 0 0 / 30%) 100%
+  );
+}
+
+.post-hero-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: clamp(3rem, 7vh, 5.5rem);
+}
+
+.post-hero-title {
+  max-width: 16ch;
+}
+
+.post-kicker {
+  margin-bottom: 1.25rem;
+  opacity: 0.82;
+}
+
+/* Three tracked-capital items wrap into a ragged block on a phone, and the
+   dots then fall at the end of a line where they read as punctuation. One
+   per line, no separators. */
+@media (max-width: 40rem) {
+  .post-kicker {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .post-kicker > *:not(:last-child)::after {
+    content: none;
+  }
+}
+
+/* Editorial opening: no overlay, words on the page, photograph underneath. */
+.post-head {
+  padding-top: clamp(3rem, 8vh, 7rem);
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.post-head-title {
+  max-width: 18ch;
+}
+
+.post-head .post-kicker {
+  opacity: 1;
+}
+
+.post-figure-inline {
+  margin-block: clamp(2rem, 4vw, 3rem) clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.post-lede {
+  padding-block: clamp(2.5rem, 5vw, 4.5rem);
+  font-family: var(--font-title);
+  font-size: clamp(1.375rem, 2.6vw, 2rem);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
+.post-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: clamp(3.5rem, 7vw, 6rem);
+  padding-top: clamp(1.75rem, 3vw, 2.5rem);
+  border-top: var(--rule-thin);
+}
+
+.post-footer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.post-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.post-related-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: clamp(1.75rem, 3vw, 2.75rem);
+}
+
+/* The last thing on the page is the next photograph, at full width. It is the
+   only navigation at the foot of a story, and it is the same size as the one
+   at the top, which is the point. */
+.post-next {
+  position: relative;
+  display: block;
+  height: min(70svh, 44rem);
+  min-height: 22rem;
+  overflow: hidden;
+  background: var(--inverted);
+  color: oklch(0.99 0 0);
+}
+
+.post-next-media {
+  position: absolute;
+  inset: 0;
+}
+
+.post-next-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.6s var(--ease-image);
+}
+
+.post-next:hover .post-next-media img {
+  transform: scale(1.05);
+}
+
+.post-next-scrim {
+  position: absolute;
+  inset: 0;
+  background: oklch(0.1 0 0 / 45%);
+  transition: background-color 0.6s var(--ease);
+}
+
+.post-next:hover .post-next-scrim {
+  background: oklch(0.1 0 0 / 32%);
+}
+
+.post-next-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+.post-next-title {
+  max-width: 16ch;
+}
+
+/* Page heads -------------------------------------------------------------- */
+
+.page-head {
+  padding-top: clamp(4rem, 12vh, 9rem);
+  padding-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.page-head-title {
+  max-width: 14ch;
+}
+
+.page-head-lede {
+  margin-top: 1.5rem;
+}
+
+/* ==========================================================================
+   Story body
+   ========================================================================== */
+
+/* Everything that is a photograph breaks out of this column — see the card
+   widths below, which are measured against it. */
+.prose {
+  --breakout: clamp(0px, calc((100vw - var(--gutter) * 2 - var(--layout-reading)) / 2), 15rem);
+
+  max-width: var(--layout-reading);
+  margin: 0 auto;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.prose > * {
+  margin-bottom: 1.5rem;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+/* Prose on a page, not in a story: nothing in it breaks out to the window. */
+.prose-page {
+  --breakout: 0px;
+
+  margin: 0;
+}
+
+.prose-page .card-wide,
+.prose-page .card-full {
+  width: 100%;
+  margin-inline: 0;
+}
+
+.prose-page > :first-child {
+  margin-top: 0;
+}
+
+/* A story's own title is the h1, so one in the body is the writer's choice.
+   It still has to outrank the h2 below it. */
+.prose h1 {
+  max-width: 20ch;
+  margin-top: clamp(3.5rem, 7vw, 5rem);
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.875rem, 3.4vw, 2.625rem);
+}
+
+.prose h2 {
+  max-width: 22ch;
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  margin-bottom: 1.25rem;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+}
+
+/* The measure is tight enough that a long heading wraps; balancing it splits
+   the lines evenly rather than dropping one word onto its own. */
+.prose :where(h1, h2, h3) {
+  text-wrap: balance;
+}
+
+.prose h3 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.prose a:not([class]) {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: opacity 0.3s var(--ease);
+}
+
+.prose a:not([class]):hover {
+  opacity: 0.65;
+}
+
+/* Tailwind's preflight strips the marker off every list, so the story body
+   has to ask for one back. */
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+  list-style-position: outside;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose li::marker {
+  color: var(--accent-text);
+}
+
+.prose hr {
+  margin-block: clamp(3rem, 6vw, 4.5rem);
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose code {
+  padding: 0.125em 0.375em;
+  border-radius: var(--radius);
+  background: var(--muted);
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.prose pre {
+  padding: clamp(1rem, 2vw, 1.5rem);
+  overflow-x: auto;
+  border: var(--rule-thin);
+  border-radius: var(--radius);
+  background: var(--muted);
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  tab-size: 4;
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+/* Tables carry no classes of their own, so `TableWrap` gives each one a frame
+   to scroll in: three columns of prose do not fit a phone, and an overflowing
+   table drags the whole page sideways with it. */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin-block: 2rem;
+  overscroll-behavior-x: contain;
+}
+
+.table-scroll:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.prose th {
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: var(--rule-strong);
+  color: var(--foreground);
+  font-family: var(--font-label);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.prose td {
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: var(--rule-thin);
+  color: var(--muted-foreground);
+}
+
+.prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.prose :where(th, td):last-child {
+  padding-right: 0;
+}
+
+/* ==========================================================================
+   Story cards
+   --------------------------------------------------------------------------
+   Widths are measured against `--breakout`, set on `.prose` above: wide
+   reaches a comfortable picture width, full reaches the window edge.
+   ========================================================================== */
+
+.card {
+  margin-block: 2.5rem;
+}
+
+.card-wide {
+  width: calc(100% + var(--breakout) * 2);
+  margin-inline: calc(var(--breakout) * -1);
+}
+
+.card-full {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* A full-width caption steps back in to the wrap's own padding. */
+.card-full > figcaption,
+.card-full .figure-caption {
+  padding-inline: var(--gutter);
+}
+
+.figure-caption,
+.prose figcaption {
+  padding-top: 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  line-height: 1.25rem;
+  text-align: left;
+}
+
+.figure-caption a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
+
+.figure-frame {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: var(--muted);
+  cursor: zoom-in;
+}
+
+.figure-frame img {
+  width: 100%;
+  transition: transform 0.6s var(--ease-image);
+}
+
+.figure-frame:hover img {
+  transform: scale(1.015);
+}
+
+/* Quotes ------------------------------------------------------------------ */
+
+/* Left-aligned, like everything else in the reading column: a centred block
+   between two left-aligned ones reads as a stray. */
+.pullquote {
+  max-width: 26ch;
+  margin: clamp(3rem, 6vw, 4.5rem) 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.pullquote::before {
+  display: block;
+  width: 0.8em;
+  height: 0.55em;
+  margin: 0 0 1.25rem;
+  color: var(--accent-text);
+  content: "\201C";
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(4rem, 7vw, 5.5rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.pullquote-attribution {
+  display: block;
+  margin-top: 1.25rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.pullquote-alt {
+  position: relative;
+  max-width: none;
+  padding: 0 2.75rem;
+  color: var(--foreground);
+  font-size: 1.375rem;
+  line-height: 1.35;
+}
+
+.pullquote-alt::before,
+.pullquote-alt::after {
+  position: absolute;
+  width: auto;
+  height: auto;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pullquote-alt::before {
+  top: -0.35rem;
+  left: 0;
+  content: "\201C";
+}
+
+.pullquote-alt::after {
+  right: 0;
+  bottom: -0.9rem;
+  content: "\201D";
+}
+
+/* Callout ----------------------------------------------------------------- */
+
+/* Mixed from the theme's tokens rather than fixed pastels, so the tints hold
+   in both colour modes. */
+.card-callout {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: color-mix(in oklab, var(--callout-tint, var(--foreground)) 12%, var(--background));
+  color: var(--foreground);
+}
+
+.card-callout-emoji {
+  flex: none;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.card-callout > div > :last-child {
+  margin-bottom: 0;
+}
+
+.card-callout-grey {
+  --callout-tint: var(--muted-foreground);
+}
+.card-callout-blue {
+  --callout-tint: oklch(0.6 0.16 250);
+}
+.card-callout-green {
+  --callout-tint: oklch(0.62 0.15 150);
+}
+.card-callout-yellow {
+  --callout-tint: oklch(0.78 0.15 85);
+}
+.card-callout-red {
+  --callout-tint: oklch(0.6 0.2 25);
+}
+.card-callout-pink {
+  --callout-tint: oklch(0.66 0.18 350);
+}
+.card-callout-purple {
+  --callout-tint: oklch(0.58 0.2 300);
+}
+.card-callout-accent {
+  --callout-tint: var(--accent);
+}
+
+/* Toggle ------------------------------------------------------------------ */
+
+.card-toggle {
+  border: var(--rule-thin);
+}
+
+.card-toggle summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.5rem;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  list-style: none;
+}
+
+.card-toggle summary::-webkit-details-marker {
+  display: none;
+}
+
+.card-toggle summary svg {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+  transition: transform 0.3s var(--ease);
+}
+
+.card-toggle[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.card-toggle-body {
+  padding: 0 1.5rem 1.25rem;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+}
+
+.card-toggle-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Bookmark ---------------------------------------------------------------- */
+
+.card-bookmark {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border: var(--rule-thin);
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.card-bookmark-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.card-bookmark-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.card-bookmark-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card-bookmark-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* An og:image is nearly always 1.91:1, so the frame is given that shape and
+   centred rather than stretched to the card's height — a tall box would crop
+   a third of the width off every preview. */
+.card-bookmark-thumb {
+  flex: 0 0 38%;
+  align-self: center;
+  max-width: 13rem;
+  aspect-ratio: 1.91;
+  overflow: hidden;
+  background: var(--muted);
+}
+
+.card-bookmark-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 40rem) {
+  .card-bookmark {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .card-bookmark-thumb {
+    flex: none;
+    max-width: none;
+  }
+}
+
+/* Audio and file ---------------------------------------------------------- */
+
+.card-audio,
+.card-file {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border: var(--rule-thin);
+  background: var(--background);
+}
+
+.card-audio-body,
+.card-file-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.card-file-body {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
+}
+
+.card-audio-title,
+.card-file-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.card-audio audio {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+.card-file-caption,
+.card-file-meta {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+
+.card-file-meta {
+  margin-top: 0.25rem;
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.card-file-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  background: var(--muted);
+  color: var(--foreground);
+}
+
+.card-file-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Button, product and CTA -------------------------------------------------- */
+
+.card-button {
+  display: flex;
+  justify-content: center;
+}
+
+.card-product {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border: var(--rule-thin);
+  background: var(--background);
+}
+
+/* Out-specifies `.prose h4`, which is the uppercase tracked style: right in
+   the prose, wrong on the lid of a card. */
+.prose h4.card-product-title {
+  max-width: none;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.card-product-description {
+  margin-top: 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.card-product-rating {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 1rem;
+}
+
+.card-product-rating svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--border);
+}
+
+.card-product-rating .is-active {
+  color: var(--accent);
+}
+
+.card-product-foot {
+  margin-top: 1.5rem;
+}
+
+.card-cta {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: var(--radius);
+  background: var(--muted);
+}
+
+.card-cta-plain {
+  padding-inline: 0;
+  border-top: var(--rule-thin);
+  border-bottom: var(--rule-thin);
+  border-radius: 0;
+  background: none;
+}
+
+@media (min-width: 48rem) {
+  .card-cta-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .card-cta-stacked {
+    grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+.card-cta-label {
+  margin-bottom: 0.75rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-label);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.card-cta-text {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.card-cta-text > :last-child {
+  margin-bottom: 0;
+}
+
+.card-cta-foot {
+  margin: 0;
+}
+
+.card-cta-body .card-cta-foot {
+  margin-top: 1.25rem;
+}
+
+.card-cta-media img {
+  width: 100%;
+  border-radius: var(--radius);
+}
+
+/* Header and signup cards -------------------------------------------------- */
+
+.card-header,
+.card-signup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  padding: clamp(3rem, 7vw, 5.5rem) var(--gutter);
+  text-align: center;
+}
+
+.card-header {
+  background: var(--inverted);
+  color: var(--inverted-foreground);
+}
+
+.card-signup {
+  background: var(--background-wash);
+}
+
+.card-header-heading,
+.card-signup-heading,
+.prose h2.card-header-heading,
+.prose h2.card-signup-heading {
+  max-width: 20ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 4vw, 3rem);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.card-header-sub,
+.card-signup-sub {
+  max-width: 44ch;
+  opacity: 0.75;
+}
+
+.card-signup .subscribe-form {
+  width: min(32rem, 100%);
+  text-align: left;
+}
+
+/* Embeds ------------------------------------------------------------------ */
+
+.card-embed iframe,
+.card-embed video {
+  width: 100%;
+  border: 0;
+}
+
+.card-embed-ratio iframe {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* ==========================================================================
+   Galleries in a story
+
+   The rows are packed by `Gallery.astro`; these rules only turn its slot
+   ratios into flex. See that file for how the packing is decided.
+   ========================================================================== */
+
+.gallery {
+  --gallery-gap: clamp(0.5rem, 1.2vw, 1.25rem);
+
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  margin-block: clamp(3rem, 7vw, 6rem);
+  padding-inline: var(--gutter);
+}
+
+/* Before the script runs, and without JavaScript. It crops nothing either,
+   it simply does not justify the rows. */
+.gallery-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--gallery-gap);
+}
+
+.gallery-rows.is-justified {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gallery-gap);
+}
+
+.gallery-row {
+  display: flex;
+  gap: var(--gallery-gap);
+  margin: 0;
+}
+
+/* A slot's flex-grow is its aspect ratio, which is what lands every slot in
+   a row at the same height. A stack is two frames sharing one slot. The ratios
+   are scaled up because grow factors summing below 1 only hand out that
+   fraction of the free space, and a lone portrait would stop short of the
+   window. */
+.is-justified .gallery-row > .gallery-frame,
+.gallery-stack {
+  flex: calc(var(--slot-aspect, 1) * 1000) 1 0%;
+  min-width: 0;
+  margin: 0;
+  aspect-ratio: var(--slot-aspect, 1);
+}
+
+.gallery-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gallery-gap);
+}
+
+.gallery-stack > .gallery-frame {
+  flex: calc(var(--stack-share, 1) * 1000) 1 0%;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+
+.gallery-frame {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: var(--muted);
+  cursor: zoom-in;
+}
+
+.gallery-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    transform 0.6s var(--ease-image),
+    opacity 0.3s var(--ease);
+}
+
+.gallery-frame:hover img {
+  opacity: 0.92;
+  transform: scale(1.02);
+}
+
+.gallery-caption {
+  padding-top: 0.75rem;
+  padding-inline: 0;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-frame img,
+  .gallery-frame:hover img {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Lightbox
+   ========================================================================== */
+
+.lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  padding: clamp(1rem, 4vw, 3rem);
+  border: 0;
+  background: oklch(0.07 0 0 / 98%);
+  color: oklch(1 0 0);
+}
+
+.lightbox::backdrop {
+  background: oklch(0.07 0 0 / 92%);
+}
+
+.lightbox:focus {
+  outline: none;
+}
+
+.lightbox-inner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.lightbox-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-width: 100%;
+  margin: 0;
+}
+
+.lightbox-figure img {
+  max-width: 100%;
+  /* Room for the caption under the tallest image. */
+  max-height: 82vh;
+  margin: 0 auto;
+  object-fit: contain;
+  animation: lightbox-in 180ms ease-out;
+}
+
+.lightbox-caption {
+  max-width: 46rem;
+  margin: 0 auto;
+  color: oklch(0.82 0 0);
+  font-family: var(--font-label);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.lightbox-count {
+  display: block;
+  margin-top: 0.5rem;
+  color: oklch(1 0 0 / 65%);
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+}
+
+/* The hit area comes from padding rather than a visible box. */
+.lightbox-close,
+.lightbox-nav {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  padding: 0.75rem;
+  color: oklch(1 0 0 / 72%);
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.lightbox-close:hover,
+.lightbox-nav:hover,
+.lightbox-close:focus-visible,
+.lightbox-nav:focus-visible {
+  color: oklch(1 0 0);
+}
+
+.lightbox-close:focus-visible,
+.lightbox-nav:focus-visible {
+  outline: 2px solid oklch(1 0 0 / 70%);
+  outline-offset: 2px;
+}
+
+.lightbox-close {
+  top: clamp(0.5rem, 2vw, 1.25rem);
+  right: clamp(0.5rem, 2vw, 1.25rem);
+}
+
+.lightbox-close svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lightbox-nav {
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.lightbox-nav:hover {
+  transform: scale(1.08);
+}
+
+.lightbox-prev {
+  left: clamp(0.25rem, 2vw, 1.25rem);
+}
+
+.lightbox-next {
+  right: clamp(0.25rem, 2vw, 1.25rem);
+}
+
+.lightbox-nav svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.lightbox-nav[hidden] {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  /* Arrows overlap the image here, where the swipe is the real control. */
+  .lightbox-nav {
+    color: oklch(1 0 0 / 55%);
+  }
+
+  .lightbox-nav svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+@keyframes lightbox-in {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-figure img {
+    animation: none;
+  }
+
+  .lightbox-nav:hover {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Error page
+   ========================================================================== */
+
+.error-page {
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+  padding-block: var(--space-section);
+  text-align: center;
+}
+
+.error-code {
+  font-family: var(--font-title);
+  font-size: clamp(6rem, 22vw, 16rem);
+  line-height: 0.8;
+  opacity: 0.12;
+}
+
+.error-message {
+  margin-top: clamp(-3rem, -4vw, -2rem);
+}
+
+.error-actions {
+  margin-top: 2.5rem;
+}
+
+/* ==========================================================================
+   Print
+   ========================================================================== */
+
+@media print {
+  .site-header-slot,
+  .site-header,
+  .site-footer,
+  .menu-panel,
+  .menu-backdrop,
+  .post-next,
+  .marquee,
+  .lightbox,
+  .sheet {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .post-hero {
+    height: auto;
+    min-height: 0;
+    color: #000;
+  }
+
+  .post-hero-media,
+  .post-hero-scrim {
+    position: static;
+  }
+
+  .prose,
+  .gallery,
+  .card-wide,
+  .card-full {
+    width: auto;
+    max-width: none;
+    margin-inline: 0;
+  }
+}
